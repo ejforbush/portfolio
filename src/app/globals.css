@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #f8f5f2;
   --foreground: #171717;
 }
 
@@ -10,6 +10,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-handwriting: var(--font-caveat);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +23,59 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Subtle film-grain texture for the "physical print" look on project cards. */
+@utility grain-overlay {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.06;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+/* Small-amplitude bob for the hero's "scroll to explore" arrow — quick,
+   continuous bouncing, like it's on a trampoline. */
+@keyframes subtle-bounce {
+  0% {
+    transform: translateY(-1px);
+    animation-timing-function: ease-in;
+  }
+  30% {
+    transform: translateY(1px);
+    animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+  }
+  100% {
+    transform: translateY(-1px);
+  }
+}
+
+@utility animate-subtle-bounce {
+  animation: subtle-bounce 0.7s infinite;
+}
+
+/* Fades the left/right edges of the project slider viewport instead of a
+   hard clip line. */
+@utility edge-fade {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 64px,
+    black calc(100% - 64px),
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 64px,
+    black calc(100% - 64px),
+    transparent
+  );
 }

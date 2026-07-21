@@ -1,23 +1,20 @@
-import Link from "next/link";
+import Image from "next/image";
+import ScrollCue from "@/components/ScrollCue";
 
 export default function Hero() {
   return (
-    <section className="mx-auto max-w-4xl px-6 py-24 text-center sm:py-32">
-      <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
-        Creating simple and enjoyable digital experiences
-      </h1>
-      <p className="mx-auto mt-6 max-w-xl text-lg text-zinc-500 dark:text-zinc-400">
-        Placeholder intro copy: a sentence or two about who I am and the kind
-        of design work I do. Update this once the real bio is ready.
-      </p>
-      <div className="mt-10">
-        <Link
-          href="/projects"
-          className="rounded-full bg-zinc-950 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
-        >
-          View projects
-        </Link>
-      </div>
-    </section>
+    <div className="grain-overlay relative h-[95vh] min-h-[480px] w-full overflow-hidden">
+      <Image
+        src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=1920&h=1200&fit=crop&q=80&auto=format"
+        alt="Close-up of an ocean wave"
+        fill
+        priority
+        unoptimized
+        sizes="100vw"
+        className="object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-black/20" />
+      <ScrollCue />
+    </div>
   );
 }

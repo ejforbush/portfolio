@@ -3,61 +3,94 @@ export type Project = {
   title: string;
   tagline: string;
   description: string;
-  tags: string[];
   image: string;
-  featured: boolean;
 };
 
 export const projects: Project[] = [
+  {
+    slug: "settings-redesign",
+    title: "Settings Redesign",
+    tagline: "Rethinking a cluttered settings experience end to end",
+    description:
+      "Placeholder description: an overview of the settings redesign case study. Real write-up coming soon.",
+    image:
+      "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=600&fit=crop&q=80&auto=format",
+  },
+  {
+    slug: "credential-management",
+    title: "Credential Management",
+    tagline: "Designing a safer, clearer way to manage credentials",
+    description:
+      "Placeholder description: an overview of the credential management case study. Real write-up coming soon.",
+    image:
+      "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&h=600&fit=crop&q=80&auto=format",
+  },
+  {
+    slug: "core-scheduling-flows",
+    title: "Core Scheduling Flows",
+    tagline: "Simplifying the scheduling flows at the heart of the product",
+    description:
+      "Placeholder description: an overview of the core scheduling flows case study. Real write-up coming soon.",
+    image:
+      "https://images.unsplash.com/photo-1506784365847-bbad939e9335?w=800&h=600&fit=crop&q=80&auto=format",
+  },
+];
+
+export const moreProjects: Project[] = [
   {
     slug: "shareable",
     title: "Shareable",
     tagline: "A rental app designed around women's safety",
     description:
-      "Placeholder description: Shareable lets neighbors rent everyday items from each other. This case study will walk through the research, safety-first design decisions, and UI flows once the real write-up is added.",
-    tags: ["Mobile App", "UX Research"],
-    image: "https://placehold.co/800x600/e5e7eb/374151?text=Shareable",
-    featured: true,
-  },
-  {
-    slug: "toothnotes",
-    title: "Toothnotes",
-    tagline: "A website redesign for a dental software company",
-    description:
-      "Placeholder description: a full marketing site redesign for Toothnotes, focused on clarifying the product's value proposition and improving conversion. Real content coming soon.",
-    tags: ["Web Design", "Redesign"],
-    image: "https://placehold.co/800x600/e5e7eb/374151?text=Toothnotes",
-    featured: true,
+      "Placeholder description: an overview of the Shareable case study. Real write-up coming soon.",
+    image:
+      "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop&q=80&auto=format",
   },
   {
     slug: "sacred-circle-healthcare",
     title: "Sacred Circle Healthcare",
     tagline: "A responsive site for a healthcare summit",
     description:
-      "Placeholder description: an event site built for a healthcare summit, designed to work seamlessly across devices for on-the-go attendees. Real content coming soon.",
-    tags: ["Web Design", "Responsive"],
+      "Placeholder description: an overview of the Sacred Circle Healthcare case study. Real write-up coming soon.",
     image:
-      "https://placehold.co/800x600/e5e7eb/374151?text=Sacred+Circle+Healthcare",
-    featured: true,
+      "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=600&fit=crop&q=80&auto=format",
   },
   {
-    slug: "task-forge",
-    title: "Task Forge",
-    tagline: "A project management tool for creative teams",
+    slug: "team-smart-power",
+    title: "Team Smart Power",
+    tagline: "Placeholder tagline for the Team Smart Power case study",
     description:
-      "Placeholder description: Task Forge blends project management with creative collaboration tools. This case study will cover the product design process end to end.",
-    tags: ["Product Design", "SaaS"],
-    image: "https://placehold.co/800x600/e5e7eb/374151?text=Task+Forge",
-    featured: true,
+      "Placeholder description: an overview of the Team Smart Power case study. Real write-up coming soon.",
+    image:
+      "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&h=600&fit=crop&q=80&auto=format",
   },
   {
-    slug: "design-showcase",
-    title: "Design Showcase",
-    tagline: "A curated collection across design mediums",
+    slug: "toothnotes",
+    title: "Toothnotes",
+    tagline: "A website redesign for a dental software company",
     description:
-      "Placeholder description: a rotating showcase of smaller design explorations spanning branding, illustration, and interaction design. Real content coming soon.",
-    tags: ["Visual Design", "Collection"],
-    image: "https://placehold.co/800x600/e5e7eb/374151?text=Design+Showcase",
-    featured: true,
+      "Placeholder description: an overview of the Toothnotes case study. Real write-up coming soon.",
+    image:
+      "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800&h=600&fit=crop&q=80&auto=format",
+  },
+  {
+    slug: "byu-soccer",
+    title: "BYU Soccer",
+    tagline: "Placeholder tagline for the BYU Soccer case study",
+    description:
+      "Placeholder description: an overview of the BYU Soccer case study. Real write-up coming soon.",
+    image:
+      "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&h=600&fit=crop&q=80&auto=format",
+  },
+  {
+    slug: "cookbook",
+    title: "Cookbook",
+    tagline: "Placeholder tagline for the Cookbook case study",
+    description:
+      "Placeholder description: an overview of the Cookbook case study. Real write-up coming soon.",
+    image:
+      "https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=800&h=600&fit=crop&q=80&auto=format",
   },
 ];
+
+export const allProjects: Project[] = [...projects, ...moreProjects];
