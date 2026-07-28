@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Caveat } from "next/font/google";
+import { Geist, Geist_Mono, Lora, Mynerve } from "next/font/google";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import EdgeBlur from "@/components/EdgeBlur";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,8 +15,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const caveat = Caveat({
-  variable: "--font-caveat",
+const mynerve = Mynerve({
+  variable: "--font-mynerve",
+  weight: "400",
+  subsets: ["latin"],
+});
+
+const lora = Lora({
+  variable: "--font-lora",
   subsets: ["latin"],
 });
 
@@ -32,12 +39,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${caveat.variable} h-full scroll-smooth antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${mynerve.variable} ${lora.variable} h-full scroll-smooth antialiased`}
     >
       <body className="relative min-h-full flex flex-col">
         <Nav />
+        <EdgeBlur edge="top" />
         <main className="flex-1">{children}</main>
         <Footer />
+        <EdgeBlur edge="bottom" />
       </body>
     </html>
   );

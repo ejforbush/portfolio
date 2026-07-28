@@ -102,8 +102,8 @@ function NavLinks({
             onClick={sectionId ? onSectionClick(sectionId) : undefined}
             className={`rounded-full px-3 py-1.5 text-sm font-semibold whitespace-nowrap transition-colors duration-150 ${
               activeHref === link.href
-                ? "bg-neutral-200 text-neutral-900 dark:bg-neutral-700 dark:text-neutral-50"
-                : "text-neutral-800 hover:bg-neutral-100 active:bg-neutral-300 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-white dark:active:bg-neutral-700"
+                ? "bg-black/10 text-neutral-900 dark:bg-white/15 dark:text-neutral-50"
+                : "text-neutral-800 hover:bg-black/5 active:bg-black/10 dark:text-neutral-300 dark:hover:bg-white/10 dark:hover:text-white dark:active:bg-white/15"
             }`}
           >
             {link.label}

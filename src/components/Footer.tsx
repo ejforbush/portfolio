@@ -1,14 +1,54 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+
+const CONNECT_WORDS = ["Let's", "connect!"];
+// Delay between each word's blur-in reveal once it starts appearing.
+const WORD_REVEAL_STAGGER_MS = 150;
+
 export default function Footer() {
+  const ref = useRef<HTMLParagraphElement>(null);
+  const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setRevealed(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.6 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <footer className="border-t border-zinc-200 dark:border-zinc-800">
+    <footer className="[overflow-anchor:none] border-t border-zinc-200 dark:border-zinc-800">
       <div className="mx-auto flex max-w-4xl flex-col items-center gap-3 px-6 py-10 text-center">
-        <p className="text-lg font-medium">Let&apos;s connect!</p>
+        <p ref={ref} className="font-handwriting text-xl">
+          {CONNECT_WORDS.map((word, index) => (
+            <span
+              key={word}
+              style={{ transitionDelay: `${index * WORD_REVEAL_STAGGER_MS}ms` }}
+              className={`inline-block transition-[filter,opacity] duration-700 ease-out ${
+                index < CONNECT_WORDS.length - 1 ? "mr-[0.3em]" : ""
+              } ${revealed ? "opacity-100 blur-none" : "opacity-0 blur-md"}`}
+            >
+              {word}
+            </span>
+          ))}
+        </p>
         <a
-          href="https://www.linkedin.com/"
+          href="https://www.linkedin.com/in/eric-forbush/"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="LinkedIn"
-          className="text-[#0A66C2] transition-all duration-150 hover:text-[#004182] active:opacity-60"
+          className="text-[#0A66C2] transition-colors duration-150 hover:text-[#004182] active:opacity-60"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
