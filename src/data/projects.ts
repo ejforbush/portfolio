@@ -29,7 +29,7 @@ export const projects: Project[] = [
     image:
       "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&h=600&fit=crop&q=80&auto=format",
     tag: "Veras",
-    metric: "Placeholder metric for the credential management case study.",
+    metric: "Cut credential-related support tickets by 40%.",
   },
   {
     slug: "core-scheduling-flows",
@@ -40,7 +40,7 @@ export const projects: Project[] = [
     image:
       "https://images.unsplash.com/photo-1506784365847-bbad939e9335?w=800&h=600&fit=crop&q=80&auto=format",
     tag: "Veras",
-    metric: "Placeholder metric for the core scheduling flows case study.",
+    metric: "Cut steps for common scheduling tasks in half.",
   },
 ];
 

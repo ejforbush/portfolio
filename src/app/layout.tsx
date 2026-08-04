@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Lora, Mynerve } from "next/font/google";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import EdgeBlur from "@/components/EdgeBlur";
+import { NavTransitionProvider } from "@/components/NavTransition";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -43,11 +44,13 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${mynerve.variable} ${lora.variable} h-full scroll-smooth antialiased`}
     >
       <body className="relative min-h-full flex flex-col">
-        <Nav />
-        <EdgeBlur edge="top" />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <EdgeBlur edge="bottom" />
+        <NavTransitionProvider>
+          <Nav />
+          <EdgeBlur edge="top" />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <EdgeBlur edge="bottom" />
+        </NavTransitionProvider>
       </body>
     </html>
   );

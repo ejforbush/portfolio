@@ -3,6 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { allProjects, projects, moreProjects } from "@/data/projects";
+import { caseStudies } from "@/data/caseStudies";
+import CaseStudyBody from "@/components/CaseStudyBody";
+import TransitionLink from "@/components/TransitionLink";
 
 export async function generateStaticParams() {
   return allProjects.map((project) => ({ slug: project.slug }));
@@ -38,6 +41,66 @@ export default async function ProjectPage({
   const prevProject = index > 0 ? collection[index - 1] : null;
   const nextProject =
     index < collection.length - 1 ? collection[index + 1] : null;
+
+  const caseStudy = caseStudies[project.slug];
+
+  if (caseStudy) {
+    return (
+      <div>
+        {/* Full-bleed banner — no top padding, so it sits directly behind
+            the fixed nav pill exactly like the home hero does. */}
+        <div className="h-[66vh] w-full overflow-hidden bg-zinc-100 dark:bg-zinc-900">
+          <Image
+            src={project.image}
+            alt={project.title}
+            width={1280}
+            height={545}
+            unoptimized
+            className="h-full w-full object-cover"
+          />
+        </div>
+        {/* max-w-[640px] matches CaseStudyBody's article column, so the
+            title wraps at the same width as the body text below it. */}
+        <div className="mx-auto max-w-[640px] px-6 pt-14 text-center">
+          <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+            {project.title}
+          </h1>
+          {project.metric && (
+            <p className="mt-3 text-lg font-medium text-zinc-900 dark:text-zinc-100">
+              {project.metric}
+            </p>
+          )}
+        </div>
+
+        <CaseStudyBody project={project} caseStudy={caseStudy} />
+
+        <div className="mx-auto flex max-w-6xl items-center justify-between border-t border-zinc-200 px-6 py-6 dark:border-zinc-800">
+          {prevProject ? (
+            <TransitionLink
+              href={`/projects/${prevProject.slug}`}
+              destinationMenuLg={prevProject.slug in caseStudies}
+              className="text-sm text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
+            >
+              ← {prevProject.title}
+            </TransitionLink>
+          ) : (
+            <span />
+          )}
+          {nextProject ? (
+            <TransitionLink
+              href={`/projects/${nextProject.slug}`}
+              destinationMenuLg={nextProject.slug in caseStudies}
+              className="text-sm text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
+            >
+              {nextProject.title} →
+            </TransitionLink>
+          ) : (
+            <span />
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-4xl px-6 pt-28 pb-16">

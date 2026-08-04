@@ -1,8 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { caseStudies } from "@/data/caseStudies";
+import {
+  useNavTransition,
+  isPlainLeftClick,
+  NAV_ENTRY_DELAY,
+  NAV_ENTER_DURATION,
+} from "@/components/NavTransition";
 
 const links = [
   { href: "/#work", label: "Work" },
@@ -17,12 +24,6 @@ const SCROLL_DURATION = 1000;
 // How much extra scroll, past the point menu-lg is fully gone, it takes to
 // fade menu-sm all the way in (and, in reverse, back out).
 const MENU_FADE_ZONE = 80;
-
-// Timing for the click-triggered page transition: fade the current menu out,
-// navigate, hold briefly, then fade the new page's menu in.
-const NAV_EXIT_DURATION = 135;
-const NAV_ENTRY_DELAY = 135;
-const NAV_ENTER_DURATION = 300;
 
 function easeInOutQuad(t: number) {
   return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
@@ -62,50 +63,11 @@ function animateScrollTo(targetY: number, duration: number, onDone?: () => void)
   requestAnimationFrame(step);
 }
 
-// Animates a plain number from `from` to `to` with the same easing as
-// animateScrollTo. Returns a cancel function. No-ops instantly (still
-// calling onDone) if there's nothing to animate.
-function animateValue(
-  from: number,
-  to: number,
-  duration: number,
-  onUpdate: (value: number) => void,
-  onDone?: () => void,
-) {
-  if (from === to) {
-    onUpdate(to);
-    onDone?.();
-    return () => {};
-  }
-  const startTime = performance.now();
-  let cancelled = false;
-
-  function step(now: number) {
-    if (cancelled) return;
-    const progress = Math.min((now - startTime) / duration, 1);
-    onUpdate(from + (to - from) * easeInOutQuad(progress));
-    if (progress < 1) {
-      requestAnimationFrame(step);
-    } else {
-      onDone?.();
-    }
-  }
-  requestAnimationFrame(step);
-
-  return () => {
-    cancelled = true;
-  };
-}
-
 function getScrollTarget(id: string): number | null {
   const el = document.getElementById(id);
   if (!el) return null;
   const marginTop = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
   return el.getBoundingClientRect().top + window.scrollY - marginTop;
-}
-
-function isPlainLeftClick(e: React.MouseEvent) {
-  return e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
 }
 
 function Brand({ onNavigate }: { onNavigate: (e: React.MouseEvent) => void }) {
@@ -168,37 +130,29 @@ function NavLinks({
 
 export default function Nav() {
   const pathname = usePathname();
-  const router = useRouter();
-  // Menu-lg exists on home and about — everywhere else (case-study pages)
-  // is always menu-sm.
+  const { navFade, predictedMenuLgRef, wasMenuFadeNavRef, navigate, fadeIn } =
+    useNavTransition();
+  // Menu-lg exists on home, about, and the large case-study pages (the ones
+  // with an entry in caseStudies) — small-template project pages
+  // (moreProjects) are always menu-sm.
   const isHome = pathname === "/";
   const isAbout = pathname === "/about";
-  const showMenuLg = isHome || isAbout;
+  const caseStudySlug = pathname.startsWith("/projects/")
+    ? pathname.slice("/projects/".length)
+    : null;
+  const isCaseStudy = caseStudySlug !== null && caseStudySlug in caseStudies;
+  const showMenuLg = isHome || isAbout || isCaseStudy;
   const menuLgRef = useRef<HTMLElement>(null);
   const [menuSmProgress, setMenuSmProgress] = useState(0);
-  // Click-triggered page-transition fade, layered on top of everything else:
-  // 1 = normal, 0 = faded out mid-transition.
-  const [navFade, setNavFade] = useState(1);
   const [activeSection, setActiveSection] = useState<"work" | null>(null);
   const suppressSpyRef = useRef(false);
-
-  // Set at click time to the destination's known size (see handleNavClick).
-  // Consumed synchronously below, before paint, to seed menuSmProgress with
-  // the right value immediately — otherwise the first paint of the new page
-  // would use whatever menuSmProgress drifted to while on the old page
-  // (irrelevant there, since menu-sm is hardcoded visible when there's no
-  // menu-lg to fade from), causing a visible pop once the real value is
-  // resynced a moment later. `wasMenuFadeNavRef` separately marks navigations
-  // that already faded out via navFade and need the delayed fade-back-in.
-  const predictedMenuLgRef = useRef<boolean | null>(null);
-  const wasMenuFadeNavRef = useRef(false);
 
   useLayoutEffect(() => {
     if (predictedMenuLgRef.current !== null) {
       setMenuSmProgress(predictedMenuLgRef.current ? 0 : 1);
       predictedMenuLgRef.current = null;
     }
-  }, [pathname]);
+  }, [pathname, predictedMenuLgRef]);
 
   // Reads menu-lg's height straight off the DOM each time, rather than
   // caching it as React state — it doesn't need to be state (nothing in the
@@ -236,7 +190,7 @@ export default function Nav() {
       const raf = requestAnimationFrame(() => {
         setMenuSmProgress(computeMenuSmTarget());
         const timeout = setTimeout(() => {
-          cancelLanding = animateValue(0, 1, NAV_ENTER_DURATION, setNavFade);
+          cancelLanding = fadeIn(NAV_ENTER_DURATION);
         }, NAV_ENTRY_DELAY);
         cancelLanding = () => clearTimeout(timeout);
       });
@@ -257,7 +211,7 @@ export default function Nav() {
       cancelLanding();
       window.removeEventListener("scroll", onScroll);
     };
-  }, [pathname]);
+  }, [pathname, fadeIn, wasMenuFadeNavRef]);
 
   useEffect(() => {
     if (pathname !== "/") return;
@@ -283,25 +237,19 @@ export default function Nav() {
   }, [pathname]);
 
   // Fades the current menu out, then navigates once it's gone — for every
-  // cross-page nav click, not just ones that change the menu's size. Menu-lg
-  // only ever exists on home, so a click leaving home is menu-lg -> menu-sm
-  // and one landing on home is menu-sm -> menu-lg, but even a same-size hop
-  // (About <-> Work, both menu-sm) still gets the fade: it reads as
-  // intentional rather than an abrupt content swap, even at this small
-  // scale. `destinationMenuLg` is what the landing page's size will actually
-  // be; `fromMenuLg` is which menu this specific click came from.
+  // cross-page nav click, not just ones that change the menu's size. Leaving
+  // a menu-lg page for a menu-sm one (or vice versa) obviously needs it, but
+  // even a same-size hop (About <-> Work, both menu-sm) still gets the fade:
+  // it reads as intentional rather than an abrupt content swap, even at this
+  // small scale. `destinationMenuLg` is what the landing page's size will
+  // actually be.
   function handleNavClick(e: React.MouseEvent, href: string, destinationMenuLg: boolean) {
     if (!isPlainLeftClick(e)) return; // let modified clicks (new tab, etc.) behave normally
     const targetPath = href.split("#")[0] || "/";
     if (targetPath === pathname) return; // already there, nothing to navigate
 
-    predictedMenuLgRef.current = destinationMenuLg;
-
     e.preventDefault();
-    animateValue(navFade, 0, NAV_EXIT_DURATION, setNavFade, () => {
-      wasMenuFadeNavRef.current = true;
-      router.push(href);
-    });
+    navigate(href, destinationMenuLg);
   }
 
   const handleSectionClick = (id: "work") => (e: React.MouseEvent) => {
@@ -350,8 +298,8 @@ export default function Nav() {
   return (
     <>
       {/* menu-lg: floats over whatever's at the top of the page (the hero
-          image on home, the page header on about). Absolute, not fixed, so
-          it scrolls away with the content. */}
+          image on home and on large case studies, the page header on
+          about). Absolute, not fixed, so it scrolls away with the content. */}
       {showMenuLg && (
         <header
           ref={menuLgRef}
@@ -374,7 +322,8 @@ export default function Nav() {
       {/* menu-sm: fixed, and only ever starts fading in once menu-lg is
           fully out of view — so the fade in and the fade out (scrolling back
           up) are symmetric, and the two never overlap on screen. Always
-          fully visible on pages without a menu-lg (case studies). */}
+          fully visible on pages that never have a menu-lg to fade from
+          (small-template project pages). */}
       <header
         style={{
           opacity: menuSmOpacity,

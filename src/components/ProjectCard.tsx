@@ -1,6 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { Project } from "@/data/projects";
+import { caseStudies } from "@/data/caseStudies";
+import TransitionLink from "@/components/TransitionLink";
 
 export default function ProjectCard({
   project,
@@ -43,11 +44,12 @@ export default function ProjectCard({
     );
   }
 
-  // No overflow-hidden on the outer Link below — it's on the inner image
-  // wrapper instead, so it doesn't also clip the Link's own shadow.
+  // No overflow-hidden on the outer link below — it's on the inner image
+  // wrapper instead, so it doesn't also clip the link's own shadow.
   return (
-    <Link
+    <TransitionLink
       href={`/projects/${project.slug}`}
+      destinationMenuLg={project.slug in caseStudies}
       className="flex flex-col gap-6 rounded-card-lg border border-black/[0.06] bg-white p-5 shadow-card transition-all duration-300 ease-[cubic-bezier(0,0,0.5,1)] hover:scale-[1.016] hover:shadow-card-hover lg:flex-row lg:gap-6 dark:border-white/[0.06] dark:bg-zinc-900"
     >
       <div className="relative aspect-[4/5] w-full shrink-0 self-start overflow-hidden rounded-card bg-zinc-100 lg:w-[320px] dark:bg-zinc-800">
@@ -77,6 +79,6 @@ export default function ProjectCard({
           </p>
         )}
       </div>
-    </Link>
+    </TransitionLink>
   );
 }
