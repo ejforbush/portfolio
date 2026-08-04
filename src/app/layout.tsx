@@ -39,6 +39,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} ${mynerve.variable} ${lora.variable} h-full scroll-smooth antialiased`}
     >
       <body className="relative min-h-full flex flex-col">

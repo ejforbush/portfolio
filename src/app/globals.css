@@ -14,6 +14,23 @@
   --font-serif: var(--font-lora);
 }
 
+/* Shared design tokens — one source of truth for the values repeated across
+   the glass pills, project cards, and nav bar, instead of retyping the same
+   raw rgba/hex strings in every file. */
+@theme {
+  /* Photo-frame corner radius: project card images, and the cards
+     themselves at their smaller (compact/tag) size. */
+  --radius-card: 2rem;
+  /* The large Work card's own (bigger) corner radius. */
+  --radius-card-lg: 3rem;
+  /* Warm off-white used for the frosted-glass pills (tags, titles, nav) in
+     light mode; dark mode pairs each usage with zinc-900 directly. */
+  --color-glass: #f7f7f7;
+  --shadow-glass: 0 8px 40px rgba(0, 0, 0, 0.12);
+  --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.12);
+  --shadow-card-hover: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -54,21 +71,14 @@ body {
   -webkit-mask-image: linear-gradient(to top, transparent, black);
 }
 
-/* Fades the left/right edges of the project slider viewport instead of a
-   hard clip line. */
-@utility edge-fade {
-  mask-image: linear-gradient(
-    to right,
-    transparent,
-    black 64px,
-    black calc(100% - 64px),
-    transparent
-  );
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent,
-    black 64px,
-    black calc(100% - 64px),
-    transparent
-  );
+/* Hides the scrollbar track/thumb while leaving the element itself still
+   scrollable (mouse wheel, trackpad, keyboard) — used on the project modal
+   so its internal scroll doesn't show a bar cutting into the rounded card. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }

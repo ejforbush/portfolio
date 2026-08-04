@@ -47,7 +47,7 @@ export default async function ProjectPage({
       <p className="mt-3 max-w-xl text-zinc-500 dark:text-zinc-400">
         {project.tagline}
       </p>
-      <div className="mt-8 aspect-[4/3] max-w-2xl overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-900">
+      <div className="mt-8 aspect-[4/3] max-w-2xl overflow-hidden rounded-card bg-zinc-100 dark:bg-zinc-900">
         <Image
           src={project.image}
           alt={project.title}

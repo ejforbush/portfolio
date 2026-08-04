@@ -14,7 +14,7 @@ export default function Home() {
       </div>
       <FadeIn>
         <section id="work" className="mx-auto max-w-[1800px] scroll-mt-24 px-6">
-          <ProjectGrid projects={projects} title="Case studies" />
+          <ProjectGrid projects={projects} title="Work" />
         </section>
       </FadeIn>
       <FadeIn>

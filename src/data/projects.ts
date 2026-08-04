@@ -28,7 +28,7 @@ export const projects: Project[] = [
       "Placeholder description: an overview of the credential management case study. Real write-up coming soon.",
     image:
       "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&h=600&fit=crop&q=80&auto=format",
-    tag: "Company",
+    tag: "Veras",
     metric: "Placeholder metric for the credential management case study.",
   },
   {
@@ -39,18 +39,18 @@ export const projects: Project[] = [
       "Placeholder description: an overview of the core scheduling flows case study. Real write-up coming soon.",
     image:
       "https://images.unsplash.com/photo-1506784365847-bbad939e9335?w=800&h=600&fit=crop&q=80&auto=format",
-    tag: "Company",
+    tag: "Veras",
     metric: "Placeholder metric for the core scheduling flows case study.",
   },
 ];
 
 export const moreProjects: Project[] = [
   {
-    slug: "shareable",
-    title: "Shareable",
+    slug: "levelup",
+    title: "LevelUp",
     tagline: "A rental app designed around women's safety",
     description:
-      "Placeholder description: an overview of the Shareable case study. Real write-up coming soon.",
+      "Placeholder description: an overview of the LevelUp case study. Real write-up coming soon.",
     image:
       "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop&q=80&auto=format",
   },
@@ -80,15 +80,6 @@ export const moreProjects: Project[] = [
       "Placeholder description: an overview of the BYU Soccer case study. Real write-up coming soon.",
     image:
       "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&h=600&fit=crop&q=80&auto=format",
-  },
-  {
-    slug: "sacred-circle-healthcare",
-    title: "Sacred Circle Healthcare",
-    tagline: "A responsive site for a healthcare summit",
-    description:
-      "Placeholder description: an overview of the Sacred Circle Healthcare case study. Real write-up coming soon.",
-    image:
-      "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=600&fit=crop&q=80&auto=format",
   },
   {
     slug: "cookbook",
