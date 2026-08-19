@@ -59,17 +59,25 @@ export default async function ProjectPage({
             className="h-full w-full object-cover"
           />
         </div>
-        {/* max-w-[640px] matches CaseStudyBody's article column, so the
-            title wraps at the same width as the body text below it. */}
-        <div className="mx-auto max-w-[640px] px-6 pt-14 text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-            {project.title}
-          </h1>
-          {project.metric && (
-            <p className="mt-3 text-lg font-medium text-zinc-900 dark:text-zinc-100">
-              {project.metric}
-            </p>
-          )}
+        {/* Reuses CaseStudyBody's own grid (empty TOC column + its
+            minmax(0,36rem) content column) and max-w-6xl container so the
+            title lines up exactly with the article's left edge and wraps
+            at the same width, instead of guessing an offset that has to be
+            kept in sync. */}
+        <div className="mx-auto max-w-6xl px-6 pt-14">
+          <div className="grid grid-cols-1 lg:grid-cols-[240px_minmax(0,36rem)] lg:gap-12">
+            <div className="hidden lg:block" />
+            <div>
+              <h1 className="text-5xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+                {project.title}
+              </h1>
+              {project.metric && (
+                <p className="mt-3 text-xl italic text-zinc-900 dark:text-zinc-100">
+                  {project.metric}
+                </p>
+              )}
+            </div>
+          </div>
         </div>
 
         <CaseStudyBody project={project} caseStudy={caseStudy} />

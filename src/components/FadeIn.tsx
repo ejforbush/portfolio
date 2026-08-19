@@ -12,12 +12,15 @@ export default function FadeIn({ children }: { children: React.ReactNode }) {
     if (!node) return;
 
     // Already in view the moment we start observing (e.g. landing directly
-    // on this section via an anchor jump) — just show it. The reveal is for
-    // scrolling INTO view, not a pop-in for content you land on already
-    // looking at, which is what happens when every card in the section
-    // crosses the intersection threshold simultaneously on arrival.
+    // on this section via an anchor jump, or a short hero leaving it on
+    // screen at load) — just show it. The reveal is for scrolling INTO
+    // view, not a pop-in for content you land on already looking at, which
+    // is what happens when every card in the section crosses the
+    // intersection threshold simultaneously on arrival. Checked against the
+    // full viewport height, not a fraction of it — any part on screen at
+    // mount counts as "already looking at it".
     const rect = node.getBoundingClientRect();
-    const alreadyInView = rect.top < window.innerHeight * 0.8 && rect.bottom > 0;
+    const alreadyInView = rect.top < window.innerHeight && rect.bottom > 0;
     if (alreadyInView) {
       setSkipAnimation(true);
       setVisible(true);

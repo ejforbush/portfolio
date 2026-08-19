@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { Project } from "@/data/projects";
 import type { CaseStudy, CaseStudyBlock } from "@/data/caseStudies";
 import ProjectModal from "@/components/ProjectModal";
@@ -9,11 +9,11 @@ function Block({ block }: { block: CaseStudyBlock }) {
   switch (block.type) {
     case "paragraph":
       return (
-        <p className="text-sm leading-5 text-zinc-600 dark:text-zinc-300">{block.text}</p>
+        <p className="text-lg leading-7 text-zinc-600 dark:text-zinc-300">{block.text}</p>
       );
     case "list":
       return (
-        <ul className="list-disc space-y-1.5 pl-5 text-sm leading-5 text-zinc-600 dark:text-zinc-300">
+        <ul className="list-disc space-y-1.5 pl-5 text-lg leading-7 text-zinc-600 dark:text-zinc-300">
           {block.items.map((item) => (
             <li key={item}>{item}</li>
           ))}
@@ -22,10 +22,10 @@ function Block({ block }: { block: CaseStudyBlock }) {
     case "insight":
       return (
         <div>
-          <p className="text-sm leading-5 font-semibold text-zinc-900 dark:text-zinc-100">
+          <p className="text-lg leading-7 font-semibold text-zinc-900 dark:text-zinc-100">
             {block.number} — {block.title}
           </p>
-          <p className="mt-1 text-sm leading-5 text-zinc-600 dark:text-zinc-300">
+          <p className="mt-1 text-lg leading-7 text-zinc-600 dark:text-zinc-300">
             {block.body}
           </p>
         </div>
@@ -33,37 +33,37 @@ function Block({ block }: { block: CaseStudyBlock }) {
   }
 }
 
-// Fires once a section's top has scrolled past the upper third of the
-// viewport (an IntersectionObserver with a bottom-heavy negative rootMargin,
-// same trick Nav's own scroll-spy leans on) — the earliest section still
-// intersecting that band is the active one, since that's the one currently
-// occupying the reading position.
+// The active section is whichever heading has most recently scrolled past
+// the line one-third down the viewport, i.e. the last one in document order
+// whose top is at or above that line — matching what the reader is
+// actually looking at, rather than a strip pinned near the sticky nav.
+// Unlike a fixed-height "band" (an IntersectionObserver rootMargin
+// approach), this can't skip short, consecutive sections that pass the
+// check within the same scroll tick.
 function useScrollSpy(ids: string[]) {
   const [activeId, setActiveId] = useState(ids[0] ?? null);
-  const visibleIds = useRef(new Set<string>());
 
   useEffect(() => {
     const elements = ids
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => el !== null);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            visibleIds.current.add(entry.target.id);
-          } else {
-            visibleIds.current.delete(entry.target.id);
-          }
+    const handleScroll = () => {
+      const offset = window.innerHeight / 3;
+      let current = elements[0]?.id ?? null;
+      for (const el of elements) {
+        if (el.getBoundingClientRect().top <= offset) {
+          current = el.id;
+        } else {
+          break;
         }
-        const firstVisible = ids.find((id) => visibleIds.current.has(id));
-        if (firstVisible) setActiveId(firstVisible);
-      },
-      { rootMargin: "-96px 0px -70% 0px", threshold: 0 },
-    );
+      }
+      if (current) setActiveId(current);
+    };
 
-    elements.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [ids]);
 
   return activeId;
@@ -82,56 +82,28 @@ export default function CaseStudyBody({
 
   return (
     <div className="mx-auto max-w-6xl px-6 pt-16 pb-24">
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[180px_minmax(0,640px)_240px] lg:gap-12">
-        {/* Meta: a row on mobile, a stacked column alongside the article on
-            desktop. */}
-        <aside className="flex flex-wrap gap-x-10 gap-y-4 lg:block lg:space-y-6">
-          <div className="space-y-0.5">
-            <p className="text-sm text-zinc-900 dark:text-zinc-100">Company</p>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              {caseStudy.meta.company}
-            </p>
-          </div>
-          <div className="space-y-0.5">
-            <p className="text-sm text-zinc-900 dark:text-zinc-100">Industry</p>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              {caseStudy.meta.industry}
-            </p>
-          </div>
-          <div className="space-y-0.5">
-            <p className="text-sm text-zinc-900 dark:text-zinc-100">Role</p>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">{caseStudy.meta.role}</p>
-          </div>
-        </aside>
-
-        <article className="space-y-10">
-          {caseStudy.sections.map((section) => (
-            <section key={section.id} id={section.id} className="scroll-mt-28 space-y-3">
-              {section.eyebrow && (
-                <p className="text-xs font-semibold tracking-[0.2em] text-zinc-400 uppercase dark:text-zinc-500">
-                  {section.eyebrow}
-                </p>
-              )}
-              {section.heading && (
-                <p className="text-lg leading-7 font-bold text-zinc-900 dark:text-zinc-100">
-                  {section.heading}
-                </p>
-              )}
-              {section.blocks.map((block, i) => (
-                <Block key={i} block={block} />
-              ))}
-            </section>
-          ))}
-        </article>
-
+      {/* Article track is 36rem (576px): at this column's text-lg, that
+          lands around 68-70 characters per line — inside body-copy
+          readability guidelines (60-75 chars, ~66 target), matching the
+          more spacious editorial feel of long-form references (Medium, The
+          Athletic) rather than a denser news-blurb width. No explicit
+          right-side column needed to keep this balanced: at max-w-6xl,
+          TOC(240) + gap(48) + article(576 cap) leaves exactly 240px of
+          natural space on the right — the same as the TOC, so it can't end
+          up wider than the left side without any extra centering logic. */}
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[240px_minmax(0,36rem)] lg:gap-12">
         {/* TOC: sticky so it tracks scroll position alongside the article;
             top offset clears the fixed nav pill. The quick-overview link
             lives in the same sticky block so it scrolls — and sticks —
             together with the section list, rather than scrolling away on
-            its own underneath it. */}
+            its own underneath it. pt-1.5 on the nav nudges its first
+            label down to visually align with the article's (larger,
+            taller-line-height) first heading, since the two use different
+            type sizes but should still read as starting on the same
+            line. */}
         <aside className="hidden lg:block">
           <div className="sticky top-24">
-            <nav className="space-y-2">
+            <nav className="space-y-2 pt-1.5">
               {caseStudy.sections.map((section) => (
                 <a
                   key={section.id}
@@ -158,6 +130,21 @@ export default function CaseStudyBody({
             </div>
           </div>
         </aside>
+
+        <article className="space-y-10">
+          {caseStudy.sections.map((section) => (
+            <section key={section.id} id={section.id} className="scroll-mt-28 space-y-3">
+              {section.heading && (
+                <p className="text-xl leading-7 font-semibold text-zinc-900 dark:text-zinc-100">
+                  {section.heading}
+                </p>
+              )}
+              {section.blocks.map((block, i) => (
+                <Block key={i} block={block} />
+              ))}
+            </section>
+          ))}
+        </article>
       </div>
 
       <ProjectModal

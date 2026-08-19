@@ -12,27 +12,16 @@ export type CaseStudyBlock =
 export type CaseStudySection = {
   id: string;
   navLabel: string;
-  eyebrow?: string;
   heading?: string;
   blocks: CaseStudyBlock[];
 };
 
 export type CaseStudy = {
-  meta: {
-    company: string;
-    industry: string;
-    role: string;
-  };
   sections: CaseStudySection[];
 };
 
 export const caseStudies: Record<string, CaseStudy> = {
   "settings-redesign": {
-    meta: {
-      company: "Veras",
-      industry: "Healthcare",
-      role: "Product designer",
-    },
     sections: [
       {
         id: "background",
@@ -108,7 +97,6 @@ export const caseStudies: Record<string, CaseStudy> = {
       {
         id: "organize-settings-for-clarity",
         navLabel: "Organize settings for clarity",
-        eyebrow: "Redesigning the experience",
         heading: "Organizing settings around workflows",
         blocks: [
           {
@@ -182,11 +170,6 @@ export const caseStudies: Record<string, CaseStudy> = {
   // redesigning-the-experience subsections, testing & iteration, outcome) so
   // the layout can be reviewed before the real write-up replaces it.
   "credential-management": {
-    meta: {
-      company: "Veras",
-      industry: "Healthcare",
-      role: "Product designer",
-    },
     sections: [
       {
         id: "background",
@@ -260,7 +243,6 @@ export const caseStudies: Record<string, CaseStudy> = {
       {
         id: "give-administrators-full-visibility",
         navLabel: "Give administrators full visibility",
-        eyebrow: "Redesigning the experience",
         heading: "Giving administrators full visibility",
         blocks: [
           {
@@ -330,11 +312,6 @@ export const caseStudies: Record<string, CaseStudy> = {
   },
 
   "core-scheduling-flows": {
-    meta: {
-      company: "Veras",
-      industry: "Healthcare",
-      role: "Product designer",
-    },
     sections: [
       {
         id: "background",
@@ -408,7 +385,6 @@ export const caseStudies: Record<string, CaseStudy> = {
       {
         id: "streamline-common-scheduling-tasks",
         navLabel: "Streamline common scheduling tasks",
-        eyebrow: "Redesigning the experience",
         heading: "Streamlining common scheduling tasks",
         blocks: [
           {
