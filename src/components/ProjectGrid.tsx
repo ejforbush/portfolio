@@ -1,6 +1,5 @@
 import type { Project } from "@/data/projects";
 import ProjectCard from "@/components/ProjectCard";
-import FadeIn from "@/components/FadeIn";
 
 export default function ProjectGrid({
   projects,
@@ -18,9 +17,7 @@ export default function ProjectGrid({
       )}
       <div className="mt-6 flex flex-col gap-14">
         {projects.map((project) => (
-          <FadeIn key={project.slug}>
-            <ProjectCard project={project} />
-          </FadeIn>
+          <ProjectCard key={project.slug} project={project} />
         ))}
       </div>
     </div>

@@ -236,7 +236,7 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
   return (
     <div className="mx-auto w-full lg:w-[70vw] lg:max-w-[1024px]">
       <h2 className="font-serif text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">
-        Other work
+        Snapshots
       </h2>
       <div className="mt-6">
         {/* Cards are sized (via cardWidth) so exactly visibleCount fill this

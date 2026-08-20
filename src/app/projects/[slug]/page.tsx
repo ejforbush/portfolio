@@ -6,7 +6,7 @@ import { allProjects, projects, moreProjects } from "@/data/projects";
 import { caseStudies } from "@/data/caseStudies";
 import CaseStudyBody from "@/components/CaseStudyBody";
 import HeroFrame from "@/components/HeroFrame";
-import TransitionLink from "@/components/TransitionLink";
+import AdditionalWork from "@/components/AdditionalWork";
 
 export async function generateStaticParams() {
   return allProjects.map((project) => ({ slug: project.slug }));
@@ -51,7 +51,13 @@ export default async function ProjectPage({
         {/* Shares HeroFrame with the home hero (Hero.tsx) — same padding,
             height, corner radius, grain overlay — just without the
             headline/gradient, since this banner doesn't carry text. */}
-        <HeroFrame src={project.image} alt={project.title} />
+        <HeroFrame src={project.image} alt={project.title}>
+          {project.tag && (
+            <span className="absolute bottom-4 left-4 inline-flex h-9 items-center rounded-full bg-glass/70 px-5 text-sm font-semibold text-zinc-900 shadow-glass backdrop-blur-xl backdrop-saturate-150 dark:bg-zinc-900/70 dark:text-zinc-100">
+              {project.tag}
+            </span>
+          )}
+        </HeroFrame>
         {/* Centers directly on the page, same max-w-[33rem] column and
             max-w-6xl/px-6 container as CaseStudyBody's article — no TOC
             here, so no need for the grid/absolute-positioning trick that
@@ -71,28 +77,10 @@ export default async function ProjectPage({
 
         <CaseStudyBody project={project} caseStudy={caseStudy} />
 
-        <div className="mx-auto flex max-w-6xl items-center justify-between border-t border-zinc-200 px-6 py-6 dark:border-zinc-800">
-          {prevProject ? (
-            <TransitionLink
-              href={`/projects/${prevProject.slug}`}
-              className="text-sm text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
-            >
-              ← {prevProject.title}
-            </TransitionLink>
-          ) : (
-            <span />
-          )}
-          {nextProject ? (
-            <TransitionLink
-              href={`/projects/${nextProject.slug}`}
-              className="text-sm text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
-            >
-              {nextProject.title} →
-            </TransitionLink>
-          ) : (
-            <span />
-          )}
-        </div>
+        <AdditionalWork
+          projects={collection.filter((p) => p.slug !== project.slug)}
+          currentSlug={project.slug}
+        />
       </div>
     );
   }

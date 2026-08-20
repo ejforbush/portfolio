@@ -62,12 +62,6 @@ export default function ProjectModal({
 
   if (!renderedProject || typeof document === "undefined") return null;
 
-  // Portaled straight to <body>: FadeIn (wrapping the section this card
-  // lives in) applies a CSS transform for its own reveal animation, and any
-  // transformed ancestor becomes the containing block for `fixed`
-  // descendants per the CSS spec — without the portal, this modal's
-  // fixed positioning would resolve against that section's box instead of
-  // the real viewport, cutting the overlay off partway down the page.
   return createPortal(
     <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true">
       {/* Overlay and card move in exact lockstep — no stagger, no scale,
