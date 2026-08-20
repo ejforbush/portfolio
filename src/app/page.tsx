@@ -7,10 +7,10 @@ export default function Home() {
   return (
     <div className="pb-24">
       <Hero />
-      <section id="work" className="mx-auto mt-[6vh] max-w-[1800px] scroll-mt-24 px-6">
+      <section id="work" className="mx-auto mt-[6vh] max-w-[1800px] scroll-mt-24 px-3 lg:px-6">
         <ProjectGrid projects={projects} />
       </section>
-      <section id="mini" className="mx-auto mt-20 max-w-[1800px] scroll-mt-24 px-6">
+      <section id="mini" className="mx-auto mt-20 max-w-[1800px] scroll-mt-24 px-3 lg:px-6">
         <ProjectSlider projects={moreProjects} />
       </section>
     </div>

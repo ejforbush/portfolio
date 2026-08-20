@@ -51,7 +51,7 @@ export default async function ProjectPage({
         {/* Shares HeroFrame with the home hero (Hero.tsx) — same padding,
             height, corner radius, grain overlay — just without the
             headline/gradient, since this banner doesn't carry text. */}
-        <HeroFrame src={project.image} alt={project.title}>
+        <HeroFrame src={project.image} alt={project.title} heightVh={70}>
           {project.tag && (
             <span className="absolute bottom-4 left-4 inline-flex h-9 items-center rounded-full bg-glass/70 px-5 text-sm font-semibold text-zinc-900 shadow-glass backdrop-blur-xl backdrop-saturate-150 dark:bg-zinc-900/70 dark:text-zinc-100">
               {project.tag}

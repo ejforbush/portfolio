@@ -11,12 +11,15 @@ const ANIM_DURATION = 800;
 // either edge. Card width is computed to fit the count exactly, rather than
 // the other way around. Tried largest-first, falling back until cards stay
 // at or above MIN_CARD_WIDTH. Deliberately skips 4 — odd counts keep a
-// single centered card, which is preferred over an even split.
-const VISIBLE_COUNT_OPTIONS = [5, 3, 2] as const;
+// single centered card, which is preferred over an even split. The trailing
+// 1 is what phone widths land on — two cards at MIN_CARD_WIDTH don't fit, so
+// it falls all the way through to a single, full-width card per page.
+const VISIBLE_COUNT_OPTIONS = [5, 3, 2, 1] as const;
 const MIN_CARD_WIDTH = 200;
-// Buffer between the clip boundary and the nearest full card — half the
-// inter-card gap — so the cut line doesn't sit flush against a card's edge.
-const EDGE_INSET_PX = GAP_PX / 2;
+// Buffer between the clip boundary and the nearest full card — a bit over
+// half the inter-card gap — so the cut line doesn't sit flush against a
+// card's edge.
+const EDGE_INSET_PX = GAP_PX / 2 + 4;
 // A dot's target offset (-index * pitch) and maxOffset (containerWidth -
 // contentWidth) are mathematically identical at the last stop, but they're
 // each built from a different chain of floating-point arithmetic, so they
@@ -25,6 +28,12 @@ const EDGE_INSET_PX = GAP_PX / 2;
 // invisible click. Slack here is well above any float error but nowhere
 // near a perceptible pixel.
 const EDGE_EPSILON_PX = 0.5;
+// Below this many pixels of pointer movement, a touch is still treated as a
+// tap (opens the card) rather than the start of a swipe.
+const DRAG_TAP_THRESHOLD_PX = 6;
+// Fraction of a card's pitch a swipe has to cross before it commits to the
+// next/previous card instead of snapping back to the current one.
+const SWIPE_COMMIT_RATIO = 0.2;
 
 function easeOutQuint(t: number) {
   return 1 - Math.pow(1 - t, 5);
@@ -56,6 +65,16 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const animationFrame = useRef<number | null>(null);
   const offsetRef = useRef(0);
+  const dragRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    startOffset: number;
+    moved: boolean;
+  } | null>(null);
+  // Set when a drag actually moved the track, so the click that a touchend
+  // synthesizes right after can be swallowed instead of opening the card.
+  const justDraggedRef = useRef(false);
   const total = projects.length;
 
   const [openProject, setOpenProject] = useState<Project | null>(null);
@@ -233,12 +252,82 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
     return () => viewport.removeEventListener("wheel", handleWheel);
   }, [metrics]);
 
+  // Touch/pen swipe-to-page. Restricted to touch/pen (not mouse) so it
+  // layers on top of, rather than fights with, the existing click-to-open
+  // and wheel/trackpad handling. The viewport's `touch-pan-y` lets the
+  // browser keep handling vertical page scrolling natively — we only ever
+  // see the gesture at all once it's already horizontal enough not to be a
+  // scroll, so there's no preventDefault tug-of-war with the page.
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (e.pointerType !== "touch" && e.pointerType !== "pen") return;
+    if (!metrics) return;
+    if (animationFrame.current !== null) {
+      cancelAnimationFrame(animationFrame.current);
+      animationFrame.current = null;
+    }
+    dragRef.current = {
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startY: e.clientY,
+      startOffset: offsetRef.current,
+      moved: false,
+    };
+  };
+
+  const handleClickCapture = (e: React.MouseEvent) => {
+    if (!justDraggedRef.current) return;
+    justDraggedRef.current = false;
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  useEffect(() => {
+    const handlePointerMove = (e: PointerEvent) => {
+      const drag = dragRef.current;
+      if (!drag || drag.pointerId !== e.pointerId || !metrics) return;
+
+      const dx = e.clientX - drag.startX;
+      if (!drag.moved) {
+        const dy = e.clientY - drag.startY;
+        if (Math.abs(dx) < DRAG_TAP_THRESHOLD_PX && Math.abs(dy) < DRAG_TAP_THRESHOLD_PX) return;
+        drag.moved = true;
+      }
+
+      const min = maxOffset(metrics);
+      applyOffset(Math.min(0, Math.max(drag.startOffset + dx, min)));
+    };
+
+    const endDrag = (e: PointerEvent) => {
+      const drag = dragRef.current;
+      if (!drag || drag.pointerId !== e.pointerId) return;
+      dragRef.current = null;
+      if (!drag.moved || !metrics) return;
+
+      justDraggedRef.current = true;
+      const dragged = offsetRef.current - drag.startOffset;
+      const threshold = metrics.pitch * SWIPE_COMMIT_RATIO;
+      let targetIndex = currentIndex;
+      if (dragged <= -threshold) targetIndex = currentIndex + 1;
+      else if (dragged >= threshold) targetIndex = currentIndex - 1;
+      goToIndex(Math.min(Math.max(targetIndex, 0), dotCount - 1));
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", endDrag);
+    window.addEventListener("pointercancel", endDrag);
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", endDrag);
+      window.removeEventListener("pointercancel", endDrag);
+    };
+  }, [metrics, currentIndex, dotCount]);
+
   return (
     <div className="mx-auto w-full lg:w-[70vw] lg:max-w-[1024px]">
       <h2 className="font-serif text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">
         Snapshots
       </h2>
-      <div className="mt-6">
+      <div className="mt-6 mx-4 lg:mx-0">
         {/* Cards are sized (via cardWidth) so exactly visibleCount fill this
             viewport's width, minus the EDGE_INSET_PX reserved on each side
             (see computeLayout above) — the horizontal padding here matches
@@ -247,20 +336,34 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
             padding gives the hover shadow (0 4px 20px) room to render
             without being clipped, since there's no card above or below to
             accidentally reveal. */}
-        <div
-          ref={viewportRef}
-          className="relative overflow-hidden px-3 pt-5 pb-8"
-        >
-          <div ref={trackRef} className="flex gap-6" style={{ willChange: "transform" }}>
-            {projects.map((project) => (
-              <div
-                key={project.slug}
-                style={{ width: cardWidth ?? undefined }}
-                className="shrink-0"
-              >
-                <ProjectCard project={project} compact onOpen={setOpenProject} />
-              </div>
-            ))}
+        {/* viewportRef stays naturally full-width and unstyled — it's purely
+            the measurement source for computeLayout/ResizeObserver. Pinning
+            a computed pixel width onto the same element being measured
+            would make it self-referential (resize would only ever re-detect
+            its own last-set width). The inner div below is the actual
+            visual clip/center box, sized to the exact computed metrics and
+            centered via mx-auto so there's no reliance on the outer
+            padding happening to match EDGE_INSET_PX pixel-for-pixel. */}
+        <div ref={viewportRef} className="w-full">
+          <div
+            onPointerDown={handlePointerDown}
+            onClickCapture={handleClickCapture}
+            style={{
+              width: metrics ? metrics.containerWidth + 2 * EDGE_INSET_PX : undefined,
+            }}
+            className="relative mx-auto touch-pan-y overflow-hidden px-4 pt-5 pb-8"
+          >
+            <div ref={trackRef} className="flex gap-6" style={{ willChange: "transform" }}>
+              {projects.map((project) => (
+                <div
+                  key={project.slug}
+                  style={{ width: cardWidth ?? undefined }}
+                  className="shrink-0"
+                >
+                  <ProjectCard project={project} compact onOpen={setOpenProject} />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         <div className="mt-2 grid grid-cols-[1fr_auto_1fr] items-center pr-[13px]">

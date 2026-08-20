@@ -7,15 +7,20 @@ import Image from "next/image";
 export default function HeroFrame({
   src,
   alt,
+  heightVh = 80,
   children,
 }: {
   src: string;
   alt: string;
+  heightVh?: number;
   children?: React.ReactNode;
 }) {
   return (
     <div className="px-0 pt-0 sm:px-8">
-      <div className="grain-overlay relative h-[69vh] min-h-[480px] w-full overflow-hidden rounded-none bg-zinc-100 sm:rounded-card dark:bg-zinc-900">
+      <div
+        style={{ height: `${heightVh}vh` }}
+        className="grain-overlay relative min-h-[480px] w-full overflow-hidden rounded-none bg-zinc-100 dark:bg-zinc-900"
+      >
         <Image
           src={src}
           alt={alt}

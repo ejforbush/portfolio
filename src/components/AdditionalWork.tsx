@@ -68,7 +68,7 @@ export default function AdditionalWork({
   return (
     <div
       ref={sectionRef}
-      className="mx-auto max-w-6xl border-t border-zinc-200 px-6 pt-8 pb-16 dark:border-zinc-800"
+      className="mx-auto max-w-6xl border-t border-zinc-200 px-3 pt-8 pb-16 lg:px-6 dark:border-zinc-800"
     >
       <p className="font-serif text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">
         Case studies

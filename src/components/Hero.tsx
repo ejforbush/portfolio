@@ -38,7 +38,7 @@ export default function Hero() {
     >
       <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-black/20" />
       <div className="absolute inset-0 flex items-center justify-center px-6">
-        <h1 className="max-w-3xl -translate-y-8 text-left font-serif text-4xl text-white sm:text-5xl md:text-6xl">
+        <h1 className="max-w-3xl -translate-y-8 text-left font-serif text-3xl text-white sm:text-5xl md:text-6xl">
           {HEADLINE_WORDS.map((word, index) => (
             <span key={word.text}>
               <span

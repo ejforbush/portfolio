@@ -16,7 +16,7 @@ const links = [
 ];
 
 const barClasses =
-  "flex w-full items-center justify-between border border-black/[0.06] bg-white/75 backdrop-blur-[10px] px-11 py-2.5 shadow-glass dark:border-white/[0.08] dark:bg-zinc-900/75";
+  "flex w-full items-center justify-between border border-black/[0.06] bg-white/75 backdrop-blur-[10px] px-7 py-2.5 shadow-glass sm:px-11 dark:border-white/[0.08] dark:bg-zinc-900/75";
 
 const SCROLL_DURATION = 1000;
 
@@ -214,7 +214,7 @@ export default function Nav() {
         transform: `translateY(${menuTranslateY}px)`,
         pointerEvents: menuInteractive ? "auto" : "none",
       }}
-      className="fixed inset-x-0 top-3 z-50 flex justify-center"
+      className="fixed inset-x-0 top-3 z-50 flex justify-center px-4"
     >
       <nav className={`max-w-xl rounded-full ${barClasses}`}>
         <Brand onNavigate={(e) => handleNavClick(e, "/")} />
