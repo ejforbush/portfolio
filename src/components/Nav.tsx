@@ -16,7 +16,7 @@ const links = [
 ];
 
 const barClasses =
-  "flex w-full items-center justify-between border border-black/[0.06] bg-white/75 backdrop-blur-[10px] px-7 py-2.5 shadow-glass sm:px-11 dark:border-white/[0.08] dark:bg-zinc-900/75";
+  "flex w-full items-center justify-between border border-black/[0.06] bg-white/75 backdrop-blur-[10px] pl-7 pr-3 py-2.5 shadow-glass sm:pl-11 sm:pr-5 dark:border-white/[0.08] dark:bg-zinc-900/75";
 
 const SCROLL_DURATION = 1000;
 
@@ -98,7 +98,7 @@ function NavLinks({
   onNavigate: (href: string) => (e: React.MouseEvent) => void;
 }) {
   return (
-    <div className="flex shrink-0 items-center gap-4">
+    <div className="flex shrink-0 items-center gap-3">
       {links.map((link) => {
         const sectionId = link.href.startsWith("/#")
           ? (link.href.slice(2) as "work")

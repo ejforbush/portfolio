@@ -335,7 +335,12 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
 
   return (
     <div className="mx-auto w-full lg:w-[70vw] lg:max-w-[1024px]">
-      <h2 className="font-serif text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">
+      {/* pl-18 nudges the heading to sit above the single mobile card's own
+          left edge — that card is centered (not flush) within its inset
+          viewport, landing ~72px in from the section edge at typical phone
+          widths. Only below sm, where the single-card layout actually
+          applies; the multi-card desktop layout has no such offset. */}
+      <h2 className="pl-18 font-serif text-2xl font-semibold tracking-tight text-zinc-900 sm:pl-0 sm:text-3xl dark:text-zinc-100">
         Snapshots
       </h2>
       <div className="mt-6">
