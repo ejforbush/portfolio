@@ -28,6 +28,12 @@ const EDGE_INSET_PX = GAP_PX / 2 + 4;
 // invisible click. Slack here is well above any float error but nowhere
 // near a perceptible pixel.
 const EDGE_EPSILON_PX = 0.5;
+// The lone mobile card (count === 1) is pinned to this width — the large
+// case-study card's own IMAGE (not the whole card) is a landscape
+// aspect-[3/2] roughly this tall at that size — and the snapshot's own
+// aspect-[2/3] is that same box just turned on its side, portrait instead
+// of landscape.
+const SINGLE_CARD_WIDTH_PX = 225;
 // Below this many pixels of pointer movement, a touch is still treated as a
 // tap (opens the card) rather than the start of a swipe.
 const DRAG_TAP_THRESHOLD_PX = 6;
@@ -55,6 +61,11 @@ function computeLayout(viewportWidth: number) {
   const count =
     VISIBLE_COUNT_OPTIONS.find((option) => widthFor(option) >= MIN_CARD_WIDTH) ??
     VISIBLE_COUNT_OPTIONS[VISIBLE_COUNT_OPTIONS.length - 1];
+
+  if (count === 1) {
+    return { count, width: Math.min(SINGLE_CARD_WIDTH_PX, widthFor(count)) };
+  }
+
   return { count, width: widthFor(count) };
 }
 
@@ -327,7 +338,7 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
       <h2 className="font-serif text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">
         Snapshots
       </h2>
-      <div className="mt-6 mx-4 lg:mx-0">
+      <div className="mt-6">
         {/* Cards are sized (via cardWidth) so exactly visibleCount fill this
             viewport's width, minus the EDGE_INSET_PX reserved on each side
             (see computeLayout above) — the horizontal padding here matches
@@ -341,32 +352,37 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
             a computed pixel width onto the same element being measured
             would make it self-referential (resize would only ever re-detect
             its own last-set width). The inner div below is the actual
-            visual clip/center box, sized to the exact computed metrics and
-            centered via mx-auto so there's no reliance on the outer
-            padding happening to match EDGE_INSET_PX pixel-for-pixel. */}
-        <div ref={viewportRef} className="w-full">
-          <div
-            onPointerDown={handlePointerDown}
-            onClickCapture={handleClickCapture}
-            style={{
-              width: metrics ? metrics.containerWidth + 2 * EDGE_INSET_PX : undefined,
-            }}
-            className="relative mx-auto touch-pan-y overflow-hidden px-4 pt-5 pb-8"
-          >
-            <div ref={trackRef} className="flex gap-6" style={{ willChange: "transform" }}>
-              {projects.map((project) => (
-                <div
-                  key={project.slug}
-                  style={{ width: cardWidth ?? undefined }}
-                  className="shrink-0"
-                >
-                  <ProjectCard project={project} compact onOpen={setOpenProject} />
-                </div>
-              ))}
+            visual clip box, sized to the exact computed metrics and
+            centered via mx-auto, so there's no reliance on the outer
+            padding happening to match EDGE_INSET_PX pixel-for-pixel. The
+            mx-4 here only insets the card viewport — the controls row below
+            stays outside it, flush with the section's own edge, so the
+            stepper can sit close to the page edge. */}
+        <div className="mx-4 lg:mx-0">
+          <div ref={viewportRef} className="w-full">
+            <div
+              onPointerDown={handlePointerDown}
+              onClickCapture={handleClickCapture}
+              style={{
+                width: metrics ? metrics.containerWidth + 2 * EDGE_INSET_PX : undefined,
+              }}
+              className="relative mx-auto touch-pan-y overflow-hidden px-4 pt-5 pb-8"
+            >
+              <div ref={trackRef} className="flex gap-6" style={{ willChange: "transform" }}>
+                {projects.map((project) => (
+                  <div
+                    key={project.slug}
+                    style={{ width: cardWidth ?? undefined }}
+                    className="shrink-0"
+                  >
+                    <ProjectCard project={project} compact onOpen={setOpenProject} />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-        <div className="mt-2 grid grid-cols-[1fr_auto_1fr] items-center pr-[13px]">
+        <div className="mt-2 grid grid-cols-[1fr_auto_1fr] items-center">
           <div />
           <div className="flex items-center justify-center gap-2">
             {Array.from({ length: dotCount }).map((_, i) => (
@@ -384,13 +400,13 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
               />
             ))}
           </div>
-          <div className="group relative ml-auto inline-flex h-9 items-center rounded-full bg-glass/80 p-1 shadow-glass backdrop-blur-xl backdrop-saturate-150 dark:bg-zinc-900/70">
+          <div className="group relative ml-auto inline-flex h-13 items-center rounded-full bg-glass/80 p-1 shadow-glass backdrop-blur-xl backdrop-saturate-150 dark:bg-zinc-900/70">
             <button
               type="button"
               onClick={() => goTo(-1)}
               disabled={atStart}
               aria-label="Previous project"
-              className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full text-zinc-900 transition-colors duration-150 hover:bg-black/5 active:bg-black/10 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-30 dark:text-zinc-100 dark:hover:bg-white/10 dark:active:bg-white/15"
+              className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-zinc-900 transition-colors duration-150 hover:bg-black/5 active:bg-black/10 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-30 dark:text-zinc-100 dark:hover:bg-white/10 dark:active:bg-white/15"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -400,20 +416,20 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="h-[18px] w-[18px]"
+                className="h-6 w-6"
               >
                 <path d="M15 18l-6-6 6-6" />
               </svg>
             </button>
             <div className="flex w-[3px] items-center justify-center px-px">
-              <div className="h-5 w-px bg-zinc-200 transition-opacity duration-150 group-hover:opacity-0 dark:bg-zinc-600" />
+              <div className="h-8 w-px bg-zinc-200 transition-opacity duration-150 group-hover:opacity-0 dark:bg-zinc-600" />
             </div>
             <button
               type="button"
               onClick={() => goTo(1)}
               disabled={atEnd}
               aria-label="Next project"
-              className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full text-zinc-900 transition-colors duration-150 hover:bg-black/5 active:bg-black/10 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-30 dark:text-zinc-100 dark:hover:bg-white/10 dark:active:bg-white/15"
+              className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-zinc-900 transition-colors duration-150 hover:bg-black/5 active:bg-black/10 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-30 dark:text-zinc-100 dark:hover:bg-white/10 dark:active:bg-white/15"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -423,7 +439,7 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="h-[18px] w-[18px]"
+                className="h-6 w-6"
               >
                 <path d="M9 6l6 6-6 6" />
               </svg>

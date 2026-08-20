@@ -101,7 +101,7 @@ export default function ProjectCard({
   return (
     <TransitionLink
       href={`/projects/${project.slug}`}
-      className="flex flex-col gap-8 rounded-card border border-black/[0.06] bg-white pt-3 pr-3 pb-8 pl-3 shadow-card transition-all duration-300 ease-[cubic-bezier(0,0,0.5,1)] hover:scale-[1.016] hover:shadow-card-hover lg:flex-row lg:gap-6 lg:p-5 dark:border-white/[0.06] dark:bg-zinc-900"
+      className="flex flex-col gap-8 rounded-card border border-black/[0.06] bg-white pt-3 pr-3 pb-5 pl-3 shadow-card transition-all duration-300 ease-[cubic-bezier(0,0,0.5,1)] hover:scale-[1.016] hover:shadow-card-hover lg:flex-row lg:gap-6 lg:p-5 dark:border-white/[0.06] dark:bg-zinc-900"
     >
       <div className="relative aspect-[3/2] w-full shrink-0 self-start overflow-hidden rounded-3xl bg-zinc-100 lg:aspect-[4/5] lg:w-[320px] dark:bg-zinc-800">
         {project.tag && (
