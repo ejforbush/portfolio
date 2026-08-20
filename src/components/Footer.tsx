@@ -30,7 +30,7 @@ export default function Footer() {
   return (
     <footer className="[overflow-anchor:none] border-t border-zinc-200 dark:border-zinc-800">
       <div className="mx-auto flex max-w-4xl flex-col items-center gap-3 px-6 py-10 text-center">
-        <p ref={ref} className="font-handwriting text-xl">
+        <p ref={ref} className="font-serif text-xl font-medium italic">
           {CONNECT_WORDS.map((word, index) => (
             <span
               key={word}

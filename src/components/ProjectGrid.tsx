@@ -12,7 +12,7 @@ export default function ProjectGrid({
   return (
     <div className="mx-auto w-full lg:w-[70vw] lg:max-w-[1024px]">
       {title && (
-        <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">
+        <h2 className="font-serif text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">
           {title}
         </h2>
       )}

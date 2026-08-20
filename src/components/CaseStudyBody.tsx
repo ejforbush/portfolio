@@ -9,11 +9,13 @@ function Block({ block }: { block: CaseStudyBlock }) {
   switch (block.type) {
     case "paragraph":
       return (
-        <p className="text-lg leading-7 text-zinc-600 dark:text-zinc-300">{block.text}</p>
+        <p className="font-serif text-xl leading-7 text-zinc-600 dark:text-zinc-300">
+          {block.text}
+        </p>
       );
     case "list":
       return (
-        <ul className="list-disc space-y-1.5 pl-5 text-lg leading-7 text-zinc-600 dark:text-zinc-300">
+        <ul className="list-disc space-y-1.5 pl-5 font-serif text-xl leading-7 text-zinc-600 dark:text-zinc-300">
           {block.items.map((item) => (
             <li key={item}>{item}</li>
           ))}
@@ -22,10 +24,10 @@ function Block({ block }: { block: CaseStudyBlock }) {
     case "insight":
       return (
         <div>
-          <p className="text-lg leading-7 font-semibold text-zinc-900 dark:text-zinc-100">
+          <p className="font-serif text-xl leading-7 font-semibold text-zinc-900 dark:text-zinc-100">
             {block.number} — {block.title}
           </p>
-          <p className="mt-1 text-lg leading-7 text-zinc-600 dark:text-zinc-300">
+          <p className="mt-1 font-serif text-xl leading-7 text-zinc-600 dark:text-zinc-300">
             {block.body}
           </p>
         </div>
@@ -82,16 +84,22 @@ export default function CaseStudyBody({
 
   return (
     <div className="mx-auto max-w-6xl px-6 pt-16 pb-24">
-      {/* Article track is 36rem (576px): at this column's text-lg, that
-          lands around 68-70 characters per line — inside body-copy
-          readability guidelines (60-75 chars, ~66 target), matching the
-          more spacious editorial feel of long-form references (Medium, The
-          Athletic) rather than a denser news-blurb width. No explicit
-          right-side column needed to keep this balanced: at max-w-6xl,
-          TOC(240) + gap(48) + article(576 cap) leaves exactly 240px of
-          natural space on the right — the same as the TOC, so it can't end
-          up wider than the left side without any extra centering logic. */}
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[240px_minmax(0,36rem)] lg:gap-12">
+      {/* Symmetric [1fr][33rem][1fr] gutter layout — a normal (non-absolute)
+          grid, so the TOC stays fully in flow and its sticky child gets a
+          proper containing block stretched to the article's height (grid's
+          default align-items: stretch), letting it track scroll the whole
+          way down like before. Because both gutters are the same 1fr, the
+          middle (article) column is always exactly page-centered on its
+          own — independent of the TOC's presence — while the TOC lives as
+          a normal grid item in the left gutter, not glued to the article
+          as a combined block. At this container's max-w-6xl cap, gap-x-6
+          (24px) × 2 + article's 33rem (528px) leaves 528px for the two
+          gutters — 264px each, comfortably more than the TOC's natural
+          ~240px, so it degrades gracefully (not a hard cutoff) as the
+          viewport narrows below that. The TOC's own width is left fluid
+          (w-full, not a fixed px), so it shrinks along with its gutter
+          rather than overflowing it. */}
+      <div className="grid grid-cols-1 gap-y-10 lg:grid-cols-[1fr_minmax(0,33rem)_1fr] lg:gap-x-6">
         {/* TOC: sticky so it tracks scroll position alongside the article;
             top offset clears the fixed nav pill. The quick-overview link
             lives in the same sticky block so it scrolls — and sticks —
@@ -102,7 +110,7 @@ export default function CaseStudyBody({
             type sizes but should still read as starting on the same
             line. */}
         <aside className="hidden lg:block">
-          <div className="sticky top-24">
+          <div className="sticky top-24 w-full">
             <nav className="space-y-2 pt-1.5">
               {caseStudy.sections.map((section) => (
                 <a
@@ -135,7 +143,7 @@ export default function CaseStudyBody({
           {caseStudy.sections.map((section) => (
             <section key={section.id} id={section.id} className="scroll-mt-28 space-y-3">
               {section.heading && (
-                <p className="text-xl leading-7 font-semibold text-zinc-900 dark:text-zinc-100">
+                <p className="font-serif text-xl leading-7 font-semibold text-zinc-900 dark:text-zinc-100">
                   {section.heading}
                 </p>
               )}

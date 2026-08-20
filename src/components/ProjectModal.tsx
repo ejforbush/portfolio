@@ -98,10 +98,12 @@ export default function ProjectModal({
         }`}
       />
       <div
-        className={`no-scrollbar absolute inset-y-4 left-1/2 w-[calc(100%-2rem)] max-w-[960px] -translate-x-1/2 overflow-y-auto rounded-card-lg bg-white transition-opacity duration-[320ms] ease-[cubic-bezier(0.4,0,0.6,1)] sm:inset-y-8 lg:inset-y-12 dark:bg-zinc-900 ${
+        className={`absolute top-1/2 left-1/2 max-h-[calc(100vh-2rem)] w-[calc(100%-2rem)] max-w-[700px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-card-lg bg-white transition-opacity duration-[320ms] ease-[cubic-bezier(0.4,0,0.6,1)] sm:h-[850px] dark:bg-zinc-900 ${
           visible ? "opacity-100" : "opacity-0"
         }`}
       >
+        {/* Sits outside the scrolling div below, so it stays pinned to the
+            corner instead of scrolling away with the content. */}
         <button
           type="button"
           onClick={onClose}
@@ -122,32 +124,31 @@ export default function ProjectModal({
           </svg>
         </button>
 
-        <div className="px-6 pt-16 pb-16 sm:px-[72px] sm:pt-20">
-          <div>
-            <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 lg:text-4xl dark:text-zinc-100">
-              {renderedProject.title}
-            </h2>
-            <p className="mt-3 text-lg text-zinc-500 sm:text-xl dark:text-zinc-400">
-              {renderedProject.tagline}
-            </p>
-          </div>
+        <div className="no-scrollbar h-full overflow-y-auto">
+          <div className="px-6 pt-16 pb-16 sm:px-[72px] sm:pt-20">
+            <div className="mx-auto max-w-[33rem]">
+              <h2 className="font-serif text-5xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+                {renderedProject.title}
+              </h2>
+              <p className="mt-3 font-serif text-xl italic text-zinc-900 dark:text-zinc-100">
+                {renderedProject.tagline}
+              </p>
 
-          <div className="mt-16 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_2fr] sm:gap-12">
-            <p className="text-xs font-semibold tracking-[0.2em] text-zinc-400 uppercase dark:text-zinc-500">
-              Overview
-            </p>
-            <p className="text-zinc-600 dark:text-zinc-300">{renderedProject.description}</p>
-          </div>
+              <div className="mt-8 aspect-[3/2] overflow-hidden rounded-card bg-zinc-100 dark:bg-zinc-800">
+                <Image
+                  src={renderedProject.image}
+                  alt={renderedProject.title}
+                  width={1200}
+                  height={900}
+                  unoptimized
+                  className="h-full w-full object-cover"
+                />
+              </div>
 
-          <div className="mt-12 mx-auto w-1/2 overflow-hidden rounded-card bg-zinc-100 dark:bg-zinc-800">
-            <Image
-              src={renderedProject.image}
-              alt={renderedProject.title}
-              width={1200}
-              height={900}
-              unoptimized
-              className="h-full w-full object-cover"
-            />
+              <p className="mt-12 font-serif text-xl leading-7 text-zinc-600 dark:text-zinc-300">
+                {renderedProject.description}
+              </p>
+            </div>
           </div>
         </div>
       </div>

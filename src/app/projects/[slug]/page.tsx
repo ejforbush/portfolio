@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { allProjects, projects, moreProjects } from "@/data/projects";
 import { caseStudies } from "@/data/caseStudies";
 import CaseStudyBody from "@/components/CaseStudyBody";
+import HeroFrame from "@/components/HeroFrame";
 import TransitionLink from "@/components/TransitionLink";
 
 export async function generateStaticParams() {
@@ -47,36 +48,24 @@ export default async function ProjectPage({
   if (caseStudy) {
     return (
       <div>
-        {/* Full-bleed banner — no top padding, so it sits directly behind
-            the fixed nav pill exactly like the home hero does. */}
-        <div className="h-[66vh] w-full overflow-hidden bg-zinc-100 dark:bg-zinc-900">
-          <Image
-            src={project.image}
-            alt={project.title}
-            width={1280}
-            height={545}
-            unoptimized
-            className="h-full w-full object-cover"
-          />
-        </div>
-        {/* Reuses CaseStudyBody's own grid (empty TOC column + its
-            minmax(0,36rem) content column) and max-w-6xl container so the
-            title lines up exactly with the article's left edge and wraps
-            at the same width, instead of guessing an offset that has to be
-            kept in sync. */}
+        {/* Shares HeroFrame with the home hero (Hero.tsx) — same padding,
+            height, corner radius, grain overlay — just without the
+            headline/gradient, since this banner doesn't carry text. */}
+        <HeroFrame src={project.image} alt={project.title} />
+        {/* Centers directly on the page, same max-w-[33rem] column and
+            max-w-6xl/px-6 container as CaseStudyBody's article — no TOC
+            here, so no need for the grid/absolute-positioning trick that
+            keeps the article centered independent of the TOC below. */}
         <div className="mx-auto max-w-6xl px-6 pt-14">
-          <div className="grid grid-cols-1 lg:grid-cols-[240px_minmax(0,36rem)] lg:gap-12">
-            <div className="hidden lg:block" />
-            <div>
-              <h1 className="text-5xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-                {project.title}
-              </h1>
-              {project.metric && (
-                <p className="mt-3 text-xl italic text-zinc-900 dark:text-zinc-100">
-                  {project.metric}
-                </p>
-              )}
-            </div>
+          <div className="mx-auto max-w-[33rem]">
+            <h1 className="font-serif text-5xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+              {project.title}
+            </h1>
+            {project.metric && (
+              <p className="mt-3 font-serif text-xl italic text-zinc-900 dark:text-zinc-100">
+                {project.metric}
+              </p>
+            )}
           </div>
         </div>
 
@@ -86,7 +75,6 @@ export default async function ProjectPage({
           {prevProject ? (
             <TransitionLink
               href={`/projects/${prevProject.slug}`}
-              destinationMenuLg={prevProject.slug in caseStudies}
               className="text-sm text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
             >
               ← {prevProject.title}
@@ -97,7 +85,6 @@ export default async function ProjectPage({
           {nextProject ? (
             <TransitionLink
               href={`/projects/${nextProject.slug}`}
-              destinationMenuLg={nextProject.slug in caseStudies}
               className="text-sm text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
             >
               {nextProject.title} →
@@ -112,10 +99,10 @@ export default async function ProjectPage({
 
   return (
     <div className="mx-auto max-w-4xl px-6 pt-28 pb-16">
-      <h1 className="text-3xl font-semibold tracking-tight">
+      <h1 className="font-serif text-3xl font-semibold tracking-tight">
         {project.title}
       </h1>
-      <p className="mt-3 max-w-xl text-zinc-500 dark:text-zinc-400">
+      <p className="mt-3 max-w-xl font-serif text-lg text-zinc-500 dark:text-zinc-400">
         {project.tagline}
       </p>
       <div className="mt-8 aspect-[4/3] max-w-2xl overflow-hidden rounded-card bg-zinc-100 dark:bg-zinc-900">
@@ -128,7 +115,7 @@ export default async function ProjectPage({
           className="h-full w-full object-cover"
         />
       </div>
-      <p className="mt-8 max-w-2xl text-zinc-600 dark:text-zinc-300">
+      <p className="mt-8 max-w-2xl font-serif text-lg text-zinc-600 dark:text-zinc-300">
         {project.description}
       </p>
       <div className="mt-12 flex max-w-2xl items-center justify-between border-t border-zinc-200 pt-6 dark:border-zinc-800">

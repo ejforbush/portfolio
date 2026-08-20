@@ -6,13 +6,11 @@ import { useNavTransition, isPlainLeftClick } from "@/components/NavTransition";
 
 export default function TransitionLink({
   href,
-  destinationMenuLg,
   className,
   children,
   onClick,
 }: {
   href: string;
-  destinationMenuLg: boolean;
   className?: string;
   children: React.ReactNode;
   onClick?: (e: React.MouseEvent) => void;
@@ -28,7 +26,7 @@ export default function TransitionLink({
     if (targetPath === pathname) return; // already there, nothing to navigate
 
     e.preventDefault();
-    navigate(href, destinationMenuLg);
+    navigate(href);
   };
 
   return (

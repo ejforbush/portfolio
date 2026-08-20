@@ -58,16 +58,11 @@ function animateValue(
 
 type NavTransitionContextValue = {
   navFade: number;
-  // Set at click time to the destination's known menu size; Nav consumes it
-  // synchronously (before paint) to seed its own state correctly on the very
-  // first frame of the new page, instead of popping once resynced a moment
-  // later.
-  predictedMenuLgRef: RefObject<boolean | null>;
   // Marks a navigation that already faded out via navFade and needs the
   // delayed fade-back-in on landing, as opposed to a route change Nav should
   // just resync to instantly (e.g. browser back/forward).
   wasMenuFadeNavRef: RefObject<boolean>;
-  navigate: (href: string, destinationMenuLg: boolean) => void;
+  navigate: (href: string) => void;
   // Fades navFade back up to 1 — used by Nav's landing effect once a
   // menu-fade navigation has arrived and settled into its new page.
   fadeIn: (duration: number, onDone?: () => void) => () => void;
@@ -78,7 +73,6 @@ const NavTransitionContext = createContext<NavTransitionContextValue | null>(nul
 export function NavTransitionProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [navFade, setNavFade] = useState(1);
-  const predictedMenuLgRef = useRef<boolean | null>(null);
   const wasMenuFadeNavRef = useRef(false);
   // Mirrors navFade so navigate() can read the current value without
   // depending on it directly — navFade updates every animation frame during
@@ -91,8 +85,7 @@ export function NavTransitionProvider({ children }: { children: React.ReactNode 
   }, [navFade]);
 
   const navigate = useCallback(
-    (href: string, destinationMenuLg: boolean) => {
-      predictedMenuLgRef.current = destinationMenuLg;
+    (href: string) => {
       animateValue(navFadeRef.current, 0, NAV_EXIT_DURATION, setNavFade, () => {
         wasMenuFadeNavRef.current = true;
         router.push(href);
@@ -107,9 +100,7 @@ export function NavTransitionProvider({ children }: { children: React.ReactNode 
   );
 
   return (
-    <NavTransitionContext.Provider
-      value={{ navFade, predictedMenuLgRef, wasMenuFadeNavRef, navigate, fadeIn }}
-    >
+    <NavTransitionContext.Provider value={{ navFade, wasMenuFadeNavRef, navigate, fadeIn }}>
       {children}
     </NavTransitionContext.Provider>
   );

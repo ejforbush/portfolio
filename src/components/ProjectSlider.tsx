@@ -235,7 +235,7 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
 
   return (
     <div className="mx-auto w-full lg:w-[70vw] lg:max-w-[1024px]">
-      <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">
+      <h2 className="font-serif text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">
         Other work
       </h2>
       <div className="mt-6">

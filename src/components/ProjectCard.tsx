@@ -1,6 +1,5 @@
 import Image from "next/image";
 import type { Project } from "@/data/projects";
-import { caseStudies } from "@/data/caseStudies";
 import TransitionLink from "@/components/TransitionLink";
 
 export default function ProjectCard({
@@ -49,7 +48,6 @@ export default function ProjectCard({
   return (
     <TransitionLink
       href={`/projects/${project.slug}`}
-      destinationMenuLg={project.slug in caseStudies}
       className="flex flex-col gap-6 rounded-card-lg border border-black/[0.06] bg-white p-5 shadow-card transition-all duration-300 ease-[cubic-bezier(0,0,0.5,1)] hover:scale-[1.016] hover:shadow-card-hover lg:flex-row lg:gap-6 dark:border-white/[0.06] dark:bg-zinc-900"
     >
       <div className="relative aspect-[4/5] w-full shrink-0 self-start overflow-hidden rounded-card bg-zinc-100 lg:w-[320px] dark:bg-zinc-800">
@@ -69,12 +67,12 @@ export default function ProjectCard({
           }`}
         />
       </div>
-      <div className="flex flex-1 -translate-y-2 flex-col justify-center gap-5">
-        <h3 className="pl-3 text-3xl font-semibold tracking-tight text-zinc-900 lg:text-4xl dark:text-zinc-100">
+      <div className="flex flex-1 -translate-y-2 flex-col justify-center gap-2">
+        <h3 className="pl-3 font-serif text-3xl font-semibold tracking-tight text-zinc-900 lg:text-4xl dark:text-zinc-100">
           {project.title}
         </h3>
         {project.metric && (
-          <p className="pl-3 text-sm font-normal text-zinc-900 dark:text-zinc-100">
+          <p className="pl-3 font-serif text-xl font-normal italic text-zinc-900 dark:text-zinc-100">
             {project.metric}
           </p>
         )}

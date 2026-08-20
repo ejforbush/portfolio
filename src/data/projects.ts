@@ -50,7 +50,7 @@ export const moreProjects: Project[] = [
     title: "LevelUp",
     tagline: "A rental app designed around women's safety",
     description:
-      "Placeholder description: an overview of the LevelUp case study. Real write-up coming soon.",
+      "Placeholder description: an overview of the LevelUp case study. Real write-up coming soon. This section will eventually cover the problem space, the research that shaped the design, and the key decisions made along the way. It will also walk through how the safety-first rental flow was designed, tested with real users, and refined based on feedback from early beta testers. Additional sections will cover the visual design system, onboarding flow, and the outcomes of the launch.",
     image:
       "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop&q=80&auto=format",
   },
@@ -59,7 +59,7 @@ export const moreProjects: Project[] = [
     title: "Toothnotes",
     tagline: "A website redesign for a dental software company",
     description:
-      "Placeholder description: an overview of the Toothnotes case study. Real write-up coming soon.",
+      "Placeholder description: an overview of the Toothnotes case study. Real write-up coming soon. This section will eventually cover the redesign process for the marketing site, including stakeholder interviews, competitive research, and the rationale behind the new information architecture. It will also cover the visual identity refresh, the responsive layout system, and how the new site performed against the old one after launch.",
     image:
       "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800&h=600&fit=crop&q=80&auto=format",
   },
@@ -68,7 +68,7 @@ export const moreProjects: Project[] = [
     title: "Team Smart Power",
     tagline: "Placeholder tagline for the Team Smart Power case study",
     description:
-      "Placeholder description: an overview of the Team Smart Power case study. Real write-up coming soon.",
+      "Placeholder description: an overview of the Team Smart Power case study. Real write-up coming soon. This section will eventually cover the project's goals, the constraints of working with an interdisciplinary engineering team, and how the product balanced technical requirements with usability. It will also cover prototyping decisions, testing with the target audience, and lessons learned from the final build.",
     image:
       "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&h=600&fit=crop&q=80&auto=format",
   },
@@ -77,7 +77,7 @@ export const moreProjects: Project[] = [
     title: "BYU Soccer",
     tagline: "Placeholder tagline for the BYU Soccer case study",
     description:
-      "Placeholder description: an overview of the BYU Soccer case study. Real write-up coming soon.",
+      "Placeholder description: an overview of the BYU Soccer case study. Real write-up coming soon. This section will eventually cover the project's goals, the research conducted with players and coaching staff, and how the final design addressed their day-to-day needs. It will also cover the iteration process, usability testing sessions, and the results observed after rollout.",
     image:
       "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&h=600&fit=crop&q=80&auto=format",
   },
@@ -86,7 +86,7 @@ export const moreProjects: Project[] = [
     title: "Cookbook",
     tagline: "Placeholder tagline for the Cookbook case study",
     description:
-      "Placeholder description: an overview of the Cookbook case study. Real write-up coming soon.",
+      "Placeholder description: an overview of the Cookbook case study. Real write-up coming soon. This section will eventually cover the concept behind the product, the research into how people actually cook and plan meals, and how that shaped the final experience. It will also cover the visual design direction, key interaction patterns, and feedback from early testers.",
     image:
       "https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=800&h=600&fit=crop&q=80&auto=format",
   },

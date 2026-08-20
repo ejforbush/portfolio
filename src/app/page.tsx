@@ -10,7 +10,7 @@ export default function Home() {
       <Hero />
       <FadeIn>
         <section id="work" className="mx-auto mt-[6vh] max-w-[1800px] scroll-mt-24 px-6">
-          <ProjectGrid projects={projects} title="Work" />
+          <ProjectGrid projects={projects} />
         </section>
       </FadeIn>
       <FadeIn>
