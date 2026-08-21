@@ -142,6 +142,17 @@ export default function Nav() {
     if (!wasMenuFadeNavRef.current) return;
     wasMenuFadeNavRef.current = false;
 
+    // A cross-page "Work" click (e.g. from a case study) lands here via
+    // navigate("/#work") — the browser scrolls to the section on arrival,
+    // but nothing ever clears the #work fragment afterward. Left in place,
+    // any later refresh jumps straight back to #work regardless of where
+    // the reader has since scrolled to. The scroll-to-anchor has already
+    // happened by the time this effect runs, so it's safe to drop the hash
+    // from the URL bar without affecting scroll position.
+    if (window.location.hash) {
+      history.replaceState(null, "", pathname + window.location.search);
+    }
+
     const timeout = setTimeout(() => {
       fadeIn(NAV_ENTER_DURATION);
     }, NAV_ENTRY_DELAY);

@@ -83,7 +83,7 @@ export default function CaseStudyBody({
   const activeId = useScrollSpy(sectionIds);
 
   return (
-    <div className="mx-auto max-w-6xl px-6 pt-16 pb-24">
+    <div className="mx-auto max-w-6xl px-6 pt-12 pb-24">
       {/* Symmetric [1fr][33rem][1fr] gutter layout — a normal (non-absolute)
           grid, so the TOC stays fully in flow and its sticky child gets a
           proper containing block stretched to the article's height (grid's

@@ -21,7 +21,7 @@ export default function ProjectCard({
     return (
       <TransitionLink
         href={`/projects/${project.slug}`}
-        className="relative flex w-full items-center gap-6 rounded-card border border-black/[0.06] bg-white p-4 shadow-card transition-all duration-300 ease-[cubic-bezier(0,0,0.5,1)] hover:scale-[1.016] hover:shadow-card-hover dark:border-white/[0.06] dark:bg-zinc-900"
+        className="relative flex w-full select-none items-center gap-6 rounded-card border border-black/[0.06] bg-white p-4 shadow-card transition-all duration-300 ease-[cubic-bezier(0,0,0.5,1)] hover:scale-[1.016] hover:shadow-card-hover dark:border-white/[0.06] dark:bg-zinc-900"
       >
         <div className="relative aspect-[3/4] w-40 shrink-0 overflow-hidden rounded-2xl bg-zinc-100 sm:w-48 dark:bg-zinc-800">
           {project.tag && (
@@ -67,17 +67,21 @@ export default function ProjectCard({
   }
 
   if (compact) {
+    // Same framed-photo treatment as the default card below (white mat,
+    // rounded-card outer / rounded-3xl inner), with the title as a small
+    // corner tag over the image — same bottom-left tag pill the default
+    // card uses for project.tag, just carrying the title text instead since
+    // these (moreProjects) don't have a separate tag.
     return (
       <button
         type="button"
         onClick={() => onOpen?.(project)}
-        className="relative flex aspect-[2/3] w-full cursor-pointer items-end rounded-card border border-black/[0.06] bg-zinc-100 p-5 text-left transition-all duration-300 ease-[cubic-bezier(0,0,0.5,1)] hover:scale-[1.016] hover:shadow-card-hover dark:border-white/[0.06] dark:bg-zinc-800"
+        className="relative aspect-[2/3] w-full cursor-pointer select-none rounded-card border border-black/[0.06] bg-white p-3 text-left shadow-card transition-all duration-300 ease-[cubic-bezier(0,0,0.5,1)] hover:scale-[1.016] hover:shadow-card-hover dark:border-white/[0.06] dark:bg-zinc-900"
       >
-        {/* overflow-hidden lives here, one layer in from the shadow — on the
-            same element as the shadow it would clip the shadow too, since
-            overflow-hidden cuts off anything rendering outside the border
-            box and box-shadow always does. */}
-        <div className="absolute inset-0 overflow-hidden rounded-card">
+        <div className="absolute inset-3 overflow-hidden rounded-3xl bg-zinc-100 dark:bg-zinc-800">
+          <span className="absolute bottom-2 left-2 z-10 inline-flex h-8 max-w-[calc(100%-16px)] items-center truncate rounded-full bg-glass/70 px-4 text-xs font-semibold text-zinc-900 shadow-glass backdrop-blur-xl backdrop-saturate-150 sm:h-9 sm:text-sm dark:bg-zinc-900/70 dark:text-zinc-100">
+            {project.title}
+          </span>
           <Image
             src={project.image}
             alt={project.title}
@@ -89,9 +93,6 @@ export default function ProjectCard({
             }`}
           />
         </div>
-        <span className="relative flex h-9 max-w-full items-center truncate rounded-full bg-glass/70 px-4 text-sm font-semibold text-zinc-900 shadow-glass backdrop-blur-xl backdrop-saturate-150 dark:bg-zinc-900/70 dark:text-zinc-100">
-          {project.title}
-        </span>
       </button>
     );
   }
@@ -101,7 +102,7 @@ export default function ProjectCard({
   return (
     <TransitionLink
       href={`/projects/${project.slug}`}
-      className="flex flex-col gap-8 rounded-card border border-black/[0.06] bg-white pt-3 pr-3 pb-5 pl-3 shadow-card transition-all duration-300 ease-[cubic-bezier(0,0,0.5,1)] hover:scale-[1.016] hover:shadow-card-hover lg:flex-row lg:gap-6 lg:p-5 dark:border-white/[0.06] dark:bg-zinc-900"
+      className="flex select-none flex-col gap-8 rounded-card border border-black/[0.06] bg-white pt-3 pr-3 pb-5 pl-3 shadow-card transition-all duration-300 ease-[cubic-bezier(0,0,0.5,1)] hover:scale-[1.016] hover:shadow-card-hover lg:flex-row lg:gap-6 lg:p-5 dark:border-white/[0.06] dark:bg-zinc-900"
     >
       <div className="relative aspect-[3/2] w-full shrink-0 self-start overflow-hidden rounded-3xl bg-zinc-100 lg:aspect-[4/5] lg:w-[320px] dark:bg-zinc-800">
         {project.tag && (

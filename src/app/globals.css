@@ -43,6 +43,20 @@ body {
   color: var(--foreground);
 }
 
+/* HeroFrame's height: mobile below sm uses --hero-h-mobile, sm and up
+   switches to --hero-h-desktop. A plain inline style can't branch on a media
+   query, so the two values ride as custom properties set by HeroFrame and
+   this rule picks between them. */
+.hero-frame-height {
+  height: var(--hero-h-mobile);
+}
+
+@media (min-width: 640px) {
+  .hero-frame-height {
+    height: var(--hero-h-desktop);
+  }
+}
+
 /* Subtle film-grain texture for the "physical print" look on project cards. */
 @utility grain-overlay {
   position: relative;

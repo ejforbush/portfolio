@@ -20,11 +20,11 @@ const MIN_CARD_WIDTH = 200;
 // half the inter-card gap — so the cut line doesn't sit flush against a
 // card's edge.
 const EDGE_INSET_PX = GAP_PX / 2 + 4;
-// A dot's target offset (-index * pitch) and maxOffset (containerWidth -
-// contentWidth) are mathematically identical at the last stop, but they're
-// each built from a different chain of floating-point arithmetic, so they
-// can land a hair apart — enough for a strict >=/<= boundary check to read
-// "not quite there," leaving the next/prev button enabled for one extra,
+// A dot's target offset (upper - index * pitch) and metrics.lower are
+// mathematically identical at the last stop, but they're each built from a
+// different chain of floating-point arithmetic, so they can land a hair
+// apart — enough for a strict >=/<= boundary check to read "not quite
+// there," leaving the next/prev button enabled for one extra,
 // invisible click. Slack here is well above any float error but nowhere
 // near a perceptible pixel.
 const EDGE_EPSILON_PX = 0.5;
@@ -69,7 +69,39 @@ function computeLayout(viewportWidth: number) {
   return { count, width: widthFor(count) };
 }
 
-type Metrics = { pitch: number; containerWidth: number; contentWidth: number };
+type Metrics = {
+  count: number;
+  width: number;
+  pitch: number;
+  containerWidth: number;
+  contentWidth: number;
+  // The offset (track translateX) bounds — "upper" is the offset for index
+  // 0 (the rightmost/least-scrolled stop), "lower" is the offset for the
+  // last index (the leftmost/most-scrolled stop). For the multi-card
+  // layout these are the old flush-align bounds (upper is always 0). For
+  // the single-card mobile layout, the clip window (containerWidth) is
+  // wider than one card, so upper is pushed right by half that slack —
+  // centering card 0 in the window instead of pinning it flush left —
+  // and every following index is centered the same way, one pitch apart.
+  upper: number;
+  lower: number;
+};
+
+// Single source of truth for every offset calculation (paging, wheel,
+// drag, and the initial/resize layout effects) — they used to each
+// recompute containerWidth/contentWidth/bounds slightly differently,
+// which was enough drift between them to leave swipe and paging
+// disagreeing about where the track was allowed to land.
+function computeSlideMetrics(viewportWidth: number, total: number): Metrics {
+  const { count, width } = computeLayout(viewportWidth);
+  const pitch = width + GAP_PX;
+  const containerWidth = viewportWidth - 2 * EDGE_INSET_PX;
+  const contentWidth = total * width + (total - 1) * GAP_PX;
+  const upper = count === 1 ? (containerWidth - width) / 2 : 0;
+  const lower =
+    count === 1 ? upper - (total - 1) * pitch : Math.min(0, containerWidth - contentWidth);
+  return { count, width, pitch, containerWidth, contentWidth, upper, lower };
+}
 
 export default function ProjectSlider({ projects }: { projects: Project[] }) {
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -90,10 +122,18 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
 
   const [openProject, setOpenProject] = useState<Project | null>(null);
 
-  // Computed so exactly visibleCount cards fill the viewport width, with no
-  // partial card ever showing at the edges.
-  const [cardWidth, setCardWidth] = useState<number | null>(null);
-  const [visibleCount, setVisibleCount] = useState<number>(VISIBLE_COUNT_OPTIONS[1]);
+  // Only the raw measurement is state — count/width/pitch/bounds are all
+  // derived from it (plus total) via computeSlideMetrics below, so there's
+  // exactly one place that formula lives.
+  const [viewportWidth, setViewportWidth] = useState<number | null>(null);
+
+  const metrics: Metrics | null = useMemo(() => {
+    if (viewportWidth === null) return null;
+    return computeSlideMetrics(viewportWidth, total);
+  }, [viewportWidth, total]);
+
+  const cardWidth = metrics?.width ?? null;
+  const visibleCount = metrics?.count ?? VISIBLE_COUNT_OPTIONS[1];
   const dotCount = Math.max(1, total - visibleCount + 1);
 
   // Driven directly off the track's pixel offset rather than a project
@@ -103,28 +143,6 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  // Derived purely from state (never read back off the DOM). offsetWidth
-  // always rounds to a whole pixel for reporting, even when the card's
-  // actual CSS width — cardWidth — is fractional; multiplying that rounded
-  // value out across every card compounded into a few stray pixels of
-  // drift, which showed up as the last "next" click landing short of the
-  // true end and needing an extra, barely-moving click before the button
-  // actually disabled. Computing containerWidth and contentWidth from the
-  // same exact cardWidth used to size the cards keeps them perfectly
-  // self-consistent, so maxOffset always lands on an exact multiple of
-  // pitch and every step (including the last) moves a full card.
-  const metrics: Metrics | null = useMemo(() => {
-    if (cardWidth === null) return null;
-    return {
-      pitch: cardWidth + GAP_PX,
-      containerWidth: visibleCount * cardWidth + (visibleCount - 1) * GAP_PX,
-      contentWidth: total * cardWidth + (total - 1) * GAP_PX,
-    };
-  }, [cardWidth, visibleCount, total]);
-
-  const maxOffset = (metrics: Metrics) =>
-    Math.min(0, metrics.containerWidth - metrics.contentWidth);
 
   const applyOffset = (value: number) => {
     offsetRef.current = value;
@@ -154,25 +172,29 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
     };
 
     animationFrame.current = requestAnimationFrame(step);
-    setAtStart(target >= -EDGE_EPSILON_PX);
-    setAtEnd(target <= maxOffset(metrics) + EDGE_EPSILON_PX);
-    setCurrentIndex(Math.round(-target / metrics.pitch));
+    setAtStart(target >= metrics.upper - EDGE_EPSILON_PX);
+    setAtEnd(target <= metrics.lower + EDGE_EPSILON_PX);
+    setCurrentIndex(Math.round((metrics.upper - target) / metrics.pitch));
   };
 
   // Steps by index (via goToIndex) rather than by raw pixel offset. The
-  // offset at the last stop is clamped to maxOffset, which generally isn't
-  // an exact multiple of pitch (the last "page" is rarely a full step) — so
-  // stepping back by a flat pitch amount from that clamped position carried
-  // its leftover fraction into every subsequent stop, leaving cards a few
-  // pixels out of alignment on the way back. Re-deriving the target from the
-  // index each time keeps every stop pinned to the same grid dots use.
+  // offset at the last stop is clamped to metrics.lower, which generally
+  // isn't an exact multiple of pitch below metrics.upper (the last "page"
+  // is rarely a full step) — so stepping back by a flat pitch amount from
+  // that clamped position carried its leftover fraction into every
+  // subsequent stop, leaving cards a few pixels out of alignment on the way
+  // back. Re-deriving the target from the index each time keeps every stop
+  // pinned to the same grid dots use.
   const goTo = (direction: 1 | -1) => {
     goToIndex(Math.min(Math.max(currentIndex + direction, 0), dotCount - 1));
   };
 
   const goToIndex = (index: number) => {
     if (!metrics) return;
-    const target = Math.min(0, Math.max(-index * metrics.pitch, maxOffset(metrics)));
+    const target = Math.min(
+      metrics.upper,
+      Math.max(metrics.upper - index * metrics.pitch, metrics.lower),
+    );
     animateTo(target, metrics);
   };
 
@@ -184,16 +206,12 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
   useLayoutEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
-    const { count, width } = computeLayout(viewport.clientWidth);
-    const containerWidth = viewport.clientWidth - 2 * EDGE_INSET_PX;
-    const contentWidth = total * width + (total - 1) * GAP_PX;
-    const max = Math.min(0, containerWidth - contentWidth);
+    const next = computeSlideMetrics(viewport.clientWidth, total);
 
-    setVisibleCount(count);
-    setCardWidth(width);
-    applyOffset(0);
+    setViewportWidth(viewport.clientWidth);
+    applyOffset(next.upper);
     setAtStart(true);
-    setAtEnd(max >= 0);
+    setAtEnd(next.lower >= next.upper - EDGE_EPSILON_PX);
     setCurrentIndex(0);
   }, [total]);
 
@@ -213,19 +231,14 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
     if (!viewport) return;
 
     const handleResize = () => {
-      const { count, width } = computeLayout(viewport.clientWidth);
-      const pitch = width + GAP_PX;
-      const containerWidth = viewport.clientWidth - 2 * EDGE_INSET_PX;
-      const contentWidth = total * width + (total - 1) * GAP_PX;
-      const max = Math.min(0, containerWidth - contentWidth);
-      const bounded = Math.min(0, Math.max(offsetRef.current, max));
+      const next = computeSlideMetrics(viewport.clientWidth, total);
+      const bounded = Math.min(next.upper, Math.max(offsetRef.current, next.lower));
 
-      setVisibleCount(count);
-      setCardWidth(width);
+      setViewportWidth(viewport.clientWidth);
       applyOffset(bounded);
-      setAtStart(bounded >= -EDGE_EPSILON_PX);
-      setAtEnd(bounded <= max + EDGE_EPSILON_PX);
-      setCurrentIndex(Math.round(-bounded / pitch));
+      setAtStart(bounded >= next.upper - EDGE_EPSILON_PX);
+      setAtEnd(bounded <= next.lower + EDGE_EPSILON_PX);
+      setCurrentIndex(Math.round((next.upper - bounded) / next.pitch));
     };
 
     const observer = new ResizeObserver(handleResize);
@@ -251,12 +264,11 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
         animationFrame.current = null;
       }
 
-      const min = maxOffset(metrics);
-      const next = Math.min(0, Math.max(offsetRef.current - e.deltaX, min));
+      const next = Math.min(metrics.upper, Math.max(offsetRef.current - e.deltaX, metrics.lower));
       applyOffset(next);
-      setAtStart(next >= -EDGE_EPSILON_PX);
-      setAtEnd(next <= min + EDGE_EPSILON_PX);
-      setCurrentIndex(Math.round(-next / metrics.pitch));
+      setAtStart(next >= metrics.upper - EDGE_EPSILON_PX);
+      setAtEnd(next <= metrics.lower + EDGE_EPSILON_PX);
+      setCurrentIndex(Math.round((metrics.upper - next) / metrics.pitch));
     };
 
     viewport.addEventListener("wheel", handleWheel, { passive: false });
@@ -304,8 +316,7 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
         drag.moved = true;
       }
 
-      const min = maxOffset(metrics);
-      applyOffset(Math.min(0, Math.max(drag.startOffset + dx, min)));
+      applyOffset(Math.min(metrics.upper, Math.max(drag.startOffset + dx, metrics.lower)));
     };
 
     const endDrag = (e: PointerEvent) => {
@@ -335,12 +346,12 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
 
   return (
     <div className="mx-auto w-full lg:w-[70vw] lg:max-w-[1024px]">
-      {/* pl-18 nudges the heading to sit above the single mobile card's own
-          left edge — that card is centered (not flush) within its inset
-          viewport, landing ~72px in from the section edge at typical phone
-          widths. Only below sm, where the single-card layout actually
-          applies; the multi-card desktop layout has no such offset. */}
-      <h2 className="pl-18 font-serif text-2xl font-semibold tracking-tight text-zinc-900 sm:pl-0 sm:text-3xl dark:text-zinc-100">
+      {/* pl-7 lines the heading up with the hero headline's own left edge on
+          mobile (~39px in at typical phone widths — the hero text isn't
+          flush against its own container either, since it's centered as a
+          block within a wider padded area). Only below sm; the multi-card
+          desktop layout has no such offset. */}
+      <h2 className="pl-7 font-serif text-2xl font-semibold tracking-tight text-zinc-900 sm:pl-0 sm:text-3xl dark:text-zinc-100">
         Snapshots
       </h2>
       <div className="mt-6">
@@ -363,7 +374,12 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
             mx-4 here only insets the card viewport — the controls row below
             stays outside it, flush with the section's own edge, so the
             stepper can sit close to the page edge. */}
-        <div className="mx-4 lg:mx-0">
+        {/* -mx-3 cancels the home page's own px-3 mobile padding (the
+            section wrapper in page.tsx) so the viewport reaches the true
+            screen edge below sm, letting the single mobile card's neighbors
+            peek in further on both sides. sm+ keeps the original mx-4 inset;
+            lg+ reverts to flush (no inset) same as before. */}
+        <div className="-mx-3 sm:mx-4 lg:mx-0">
           <div ref={viewportRef} className="w-full">
             <div
               onPointerDown={handlePointerDown}
@@ -405,20 +421,23 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
               />
             ))}
           </div>
-          <div className="group relative ml-auto inline-flex h-13 items-center rounded-full bg-glass/80 p-1 shadow-glass backdrop-blur-xl backdrop-saturate-150 dark:bg-zinc-900/70">
+          {/* Hidden on mobile — swipe is the primary way to move the slider
+              there; the stepper only shows once there's room for a mouse-
+              driven desktop layout, at sm and up. */}
+          <div className="group relative ml-auto hidden h-9 w-[74px] items-center justify-center gap-0.5 rounded-full bg-glass/80 p-1 shadow-glass backdrop-blur-xl backdrop-saturate-150 sm:inline-flex dark:bg-zinc-900/70">
             <button
               type="button"
               onClick={() => goTo(-1)}
               disabled={atStart}
               aria-label="Previous project"
-              className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-zinc-900 transition-colors duration-150 hover:bg-black/5 active:bg-black/10 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-30 dark:text-zinc-100 dark:hover:bg-white/10 dark:active:bg-white/15"
+              className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full text-zinc-700 transition-colors duration-150 hover:bg-black/5 active:bg-black/10 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-30 dark:text-zinc-300 dark:hover:bg-white/10 dark:active:bg-white/15"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth={2}
+                strokeWidth={1.5}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 className="h-6 w-6"
@@ -426,22 +445,22 @@ export default function ProjectSlider({ projects }: { projects: Project[] }) {
                 <path d="M15 18l-6-6 6-6" />
               </svg>
             </button>
-            <div className="flex w-[3px] items-center justify-center px-px">
-              <div className="h-8 w-px bg-zinc-200 transition-opacity duration-150 group-hover:opacity-0 dark:bg-zinc-600" />
+            <div className="flex w-[6px] items-center justify-center px-px">
+              <div className="h-5 w-px bg-zinc-200 transition-opacity duration-150 group-hover:opacity-0 dark:bg-zinc-600" />
             </div>
             <button
               type="button"
               onClick={() => goTo(1)}
               disabled={atEnd}
               aria-label="Next project"
-              className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-zinc-900 transition-colors duration-150 hover:bg-black/5 active:bg-black/10 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-30 dark:text-zinc-100 dark:hover:bg-white/10 dark:active:bg-white/15"
+              className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full text-zinc-700 transition-colors duration-150 hover:bg-black/5 active:bg-black/10 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-30 dark:text-zinc-300 dark:hover:bg-white/10 dark:active:bg-white/15"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth={2}
+                strokeWidth={1.5}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 className="h-6 w-6"

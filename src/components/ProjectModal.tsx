@@ -84,15 +84,17 @@ export default function ProjectModal({
           a direct side-by-side screenshot comparison against apple.com —
           their blur reads as fully illegible text/edges, which needed
           noticeably more than the built-in scale provides. */}
+      {/* Hidden on mobile — the modal is a full-screen takeover there, so
+          there's no page showing around it for a backdrop to sit over. */}
       <div
         onClick={onClose}
         aria-hidden
-        className={`absolute inset-0 bg-black/30 backdrop-blur-[80px] transition-opacity duration-[320ms] ease-[cubic-bezier(0.4,0,0.6,1)] ${
+        className={`absolute inset-0 hidden bg-black/30 backdrop-blur-[80px] transition-opacity duration-[320ms] ease-[cubic-bezier(0.4,0,0.6,1)] sm:block ${
           visible ? "opacity-100" : "opacity-0"
         }`}
       />
       <div
-        className={`absolute top-1/2 left-1/2 max-h-[calc(100vh-2rem)] w-[calc(100%-2rem)] max-w-[700px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-card-lg bg-white transition-opacity duration-[320ms] ease-[cubic-bezier(0.4,0,0.6,1)] sm:h-[850px] dark:bg-zinc-900 ${
+        className={`absolute inset-0 h-full w-full overflow-hidden bg-white transition-opacity duration-[320ms] ease-[cubic-bezier(0.4,0,0.6,1)] sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-[850px] sm:w-[calc(100%-2rem)] sm:max-w-[850px] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-card-lg dark:bg-zinc-900 ${
           visible ? "opacity-100" : "opacity-0"
         }`}
       >
@@ -119,12 +121,16 @@ export default function ProjectModal({
         </button>
 
         <div className="no-scrollbar h-full overflow-y-auto">
-          <div className="px-6 pt-16 pb-16 sm:px-[72px] sm:pt-20">
+          <div className="px-4 pt-16 pb-16 sm:px-[72px] sm:pt-20">
             <div className="mx-auto max-w-[33rem]">
-              <h2 className="font-serif text-5xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+              {/* Same idea as the case-study page: the image runs the full
+                  width of this column, while the text sits in a narrower
+                  inset — extra px-3 on mobile only, where the column's own
+                  px-6 wasn't enough breathing room next to a wider image. */}
+              <h2 className="px-3 font-serif text-5xl font-semibold tracking-tight text-zinc-900 sm:px-0 dark:text-zinc-100">
                 {renderedProject.title}
               </h2>
-              <p className="mt-3 font-serif text-xl italic text-zinc-900 dark:text-zinc-100">
+              <p className="mt-3 px-3 font-serif text-xl italic text-zinc-900 sm:px-0 dark:text-zinc-100">
                 {renderedProject.tagline}
               </p>
 
@@ -139,7 +145,7 @@ export default function ProjectModal({
                 />
               </div>
 
-              <p className="mt-12 font-serif text-xl leading-7 text-zinc-600 dark:text-zinc-300">
+              <p className="mt-12 px-3 font-serif text-xl leading-7 text-zinc-600 sm:px-0 dark:text-zinc-300">
                 {renderedProject.description}
               </p>
             </div>

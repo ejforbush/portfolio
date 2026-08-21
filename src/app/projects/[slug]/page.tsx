@@ -51,7 +51,12 @@ export default async function ProjectPage({
         {/* Shares HeroFrame with the home hero (Hero.tsx) — same padding,
             height, corner radius, grain overlay — just without the
             headline/gradient, since this banner doesn't carry text. */}
-        <HeroFrame src={project.image} alt={project.title} heightVh={70}>
+        <HeroFrame
+          src={project.image}
+          alt={project.title}
+          heightVh={70}
+          mobileHeightVh={64}
+        >
           {project.tag && (
             <span className="absolute bottom-4 left-4 inline-flex h-9 items-center rounded-full bg-glass/70 px-5 text-sm font-semibold text-zinc-900 shadow-glass backdrop-blur-xl backdrop-saturate-150 dark:bg-zinc-900/70 dark:text-zinc-100">
               {project.tag}
@@ -62,7 +67,7 @@ export default async function ProjectPage({
             max-w-6xl/px-6 container as CaseStudyBody's article — no TOC
             here, so no need for the grid/absolute-positioning trick that
             keeps the article centered independent of the TOC below. */}
-        <div className="mx-auto max-w-6xl px-6 pt-7">
+        <div className="mx-auto max-w-6xl px-6 pt-12">
           <div className="mx-auto max-w-[33rem]">
             <h1 className="font-serif text-5xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
               {project.title}

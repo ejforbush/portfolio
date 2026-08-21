@@ -8,18 +8,27 @@ export default function HeroFrame({
   src,
   alt,
   heightVh = 80,
+  mobileHeightVh,
   children,
 }: {
   src: string;
   alt: string;
   heightVh?: number;
+  // Below the sm breakpoint only — defaults to heightVh (no mobile-specific
+  // override) so existing callers that don't pass it are unaffected.
+  mobileHeightVh?: number;
   children?: React.ReactNode;
 }) {
   return (
     <div className="px-0 pt-0 sm:px-8">
       <div
-        style={{ height: `${heightVh}vh` }}
-        className="grain-overlay relative min-h-[480px] w-full overflow-hidden rounded-none bg-zinc-100 dark:bg-zinc-900"
+        style={
+          {
+            "--hero-h-mobile": `${mobileHeightVh ?? heightVh}vh`,
+            "--hero-h-desktop": `${heightVh}vh`,
+          } as React.CSSProperties
+        }
+        className="hero-frame-height grain-overlay relative min-h-[480px] w-full overflow-hidden rounded-none bg-zinc-100 sm:rounded-3xl dark:bg-zinc-900"
       >
         <Image
           src={src}

@@ -35,6 +35,7 @@ export default function Hero() {
     <HeroFrame
       src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=1920&h=1200&fit=crop&q=80&auto=format"
       alt="Close-up of an ocean wave"
+      mobileHeightVh={64}
     >
       <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-black/20" />
       <div className="absolute inset-0 flex items-center justify-center px-6">

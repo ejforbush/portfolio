@@ -81,15 +81,6 @@ export const moreProjects: Project[] = [
     image:
       "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&h=600&fit=crop&q=80&auto=format",
   },
-  {
-    slug: "cookbook",
-    title: "Cookbook",
-    tagline: "Placeholder tagline for the Cookbook case study",
-    description:
-      "Placeholder description: an overview of the Cookbook case study. Real write-up coming soon. This section will eventually cover the concept behind the product, the research into how people actually cook and plan meals, and how that shaped the final experience. It will also cover the visual design direction, key interaction patterns, and feedback from early testers.",
-    image:
-      "https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=800&h=600&fit=crop&q=80&auto=format",
-  },
 ];
 
 export const allProjects: Project[] = [...projects, ...moreProjects];
