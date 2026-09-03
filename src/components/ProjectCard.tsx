@@ -1,6 +1,16 @@
 import Image from "next/image";
 import type { Project } from "@/data/projects";
 import TransitionLink from "@/components/TransitionLink";
+import { getImageFocus } from "@/lib/imageFocus";
+
+function focusStyle(project: Project) {
+  const { x, y, zoom } = getImageFocus(project.slug);
+  return {
+    objectPosition: `${x}% ${y}%`,
+    transform: zoom !== 1 ? `scale(${zoom})` : undefined,
+    transformOrigin: `${x}% ${y}%`,
+  };
+}
 
 export default function ProjectCard({
   project,
@@ -35,6 +45,7 @@ export default function ProjectCard({
             width={384}
             height={512}
             unoptimized
+            style={focusStyle(project)}
             className={`h-full w-full object-cover transition-all duration-500 ${
               dimmed ? "grayscale-[45%] brightness-[0.85]" : ""
             }`}
@@ -76,23 +87,22 @@ export default function ProjectCard({
       <button
         type="button"
         onClick={() => onOpen?.(project)}
-        className="relative aspect-[2/3] w-full cursor-pointer select-none rounded-card border border-black/[0.06] bg-white p-3 text-left shadow-card transition-all duration-300 ease-[cubic-bezier(0,0,0.5,1)] hover:scale-[1.016] hover:shadow-card-hover dark:border-white/[0.06] dark:bg-zinc-900"
+        className="relative aspect-[2/3] w-full cursor-pointer select-none overflow-hidden rounded-3xl bg-zinc-100 text-left transition-all duration-300 ease-[cubic-bezier(0,0,0.5,1)] hover:scale-[1.016] dark:bg-zinc-800"
       >
-        <div className="absolute inset-3 overflow-hidden rounded-3xl bg-zinc-100 dark:bg-zinc-800">
-          <span className="absolute bottom-2 left-2 z-10 inline-flex h-8 max-w-[calc(100%-16px)] items-center truncate rounded-full bg-glass/70 px-4 text-xs font-semibold text-zinc-900 shadow-glass backdrop-blur-xl backdrop-saturate-150 sm:h-9 sm:text-sm dark:bg-zinc-900/70 dark:text-zinc-100">
-            {project.title}
-          </span>
-          <Image
-            src={project.image}
-            alt={project.title}
-            width={800}
-            height={1200}
-            unoptimized
-            className={`h-full w-full object-cover transition-all duration-500 ${
-              dimmed ? "grayscale-[45%] brightness-[0.85]" : ""
-            }`}
-          />
-        </div>
+        <span className="absolute bottom-4 left-4 z-10 inline-flex h-8 max-w-[calc(100%-32px)] items-center truncate rounded-full bg-glass/70 px-4 text-xs font-semibold text-zinc-900 shadow-glass backdrop-blur-xl backdrop-saturate-150 sm:h-9 sm:text-sm dark:bg-zinc-900/70 dark:text-zinc-100">
+          {project.title}
+        </span>
+        <Image
+          src={project.image}
+          alt={project.title}
+          width={800}
+          height={1200}
+          unoptimized
+          style={focusStyle(project)}
+          className={`h-full w-full object-cover transition-all duration-500 ${
+            dimmed ? "grayscale-[45%] brightness-[0.85]" : ""
+          }`}
+        />
       </button>
     );
   }
@@ -116,6 +126,7 @@ export default function ProjectCard({
           width={800}
           height={1000}
           unoptimized
+          style={focusStyle(project)}
           className={`h-full w-full object-cover transition-all duration-500 ${
             dimmed ? "grayscale-[45%] brightness-[0.85]" : ""
           }`}

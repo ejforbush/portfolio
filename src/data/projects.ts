@@ -6,6 +6,10 @@ export type Project = {
   image: string;
   tag?: string;
   metric?: string;
+  // Additional full designs shown below the description in the modal —
+  // each keeps its own intrinsic size instead of being cropped to a shared
+  // aspect ratio, since these are finished graphics, not photos.
+  gallery?: { src: string; width: number; height: number }[];
 };
 
 export const projects: Project[] = [
@@ -51,8 +55,7 @@ export const moreProjects: Project[] = [
     tagline: "A rental app designed around women's safety",
     description:
       "Placeholder description: an overview of the LevelUp case study. Real write-up coming soon. This section will eventually cover the problem space, the research that shaped the design, and the key decisions made along the way. It will also walk through how the safety-first rental flow was designed, tested with real users, and refined based on feedback from early beta testers. Additional sections will cover the visual design system, onboarding flow, and the outcomes of the launch.",
-    image:
-      "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop&q=80&auto=format",
+    image: "/projects/levelup.jpg",
   },
   {
     slug: "toothnotes",
@@ -60,8 +63,7 @@ export const moreProjects: Project[] = [
     tagline: "A website redesign for a dental software company",
     description:
       "Placeholder description: an overview of the Toothnotes case study. Real write-up coming soon. This section will eventually cover the redesign process for the marketing site, including stakeholder interviews, competitive research, and the rationale behind the new information architecture. It will also cover the visual identity refresh, the responsive layout system, and how the new site performed against the old one after launch.",
-    image:
-      "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800&h=600&fit=crop&q=80&auto=format",
+    image: "/projects/toothnotes.jpg",
   },
   {
     slug: "team-smart-power",
@@ -75,11 +77,15 @@ export const moreProjects: Project[] = [
   {
     slug: "byu-soccer",
     title: "BYU Soccer",
-    tagline: "Placeholder tagline for the BYU Soccer case study",
+    tagline: "Social media design for the BYU Men's Soccer team",
     description:
-      "Placeholder description: an overview of the BYU Soccer case study. Real write-up coming soon. This section will eventually cover the project's goals, the research conducted with players and coaching staff, and how the final design addressed their day-to-day needs. It will also cover the iteration process, usability testing sessions, and the results observed after rollout.",
-    image:
-      "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&h=600&fit=crop&q=80&auto=format",
+      "I got to work with the BYU Men's soccer team my last year of college. I designed and posted social media content for the team for their entire season. These are a couple of my favorite designs that I created in Photoshop.\n\nThe first is a Facebook Cover I could update for each upcoming game; the second I would take photos from the game as they came in and create a post with the halftime and final scores; the third was for an alumni game. I enjoyed really getting to refine their brand image and come up with a lot of great content at scale.",
+    image: "/projects/byu-soccer.jpg",
+    gallery: [
+      { src: "/projects/byu-soccer-facebook-cover.jpg", width: 1600, height: 609 },
+      { src: "/projects/byu-soccer-game-score.jpg", width: 1600, height: 1600 },
+      { src: "/projects/byu-soccer-alumni-weekend.jpg", width: 1600, height: 1600 },
+    ],
   },
 ];
 

@@ -104,7 +104,7 @@ export default function ProjectModal({
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute top-8 right-8 z-10 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-zinc-900 transition-colors duration-150 hover:bg-black/5 active:bg-black/10 dark:text-zinc-100 dark:hover:bg-white/10 dark:active:bg-white/15"
+          className="absolute top-6 right-6 z-10 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-glass/80 text-zinc-900 shadow-glass backdrop-blur-xl backdrop-saturate-150 transition-colors duration-150 hover:bg-black/5 active:bg-black/10 dark:bg-zinc-900/70 dark:text-zinc-100 dark:hover:bg-white/10 dark:active:bg-white/15"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -121,8 +121,8 @@ export default function ProjectModal({
         </button>
 
         <div className="no-scrollbar h-full overflow-y-auto">
-          <div className="px-4 pt-16 pb-16 sm:px-[72px] sm:pt-20">
-            <div className="mx-auto max-w-[33rem]">
+          <div className="px-2 pt-16 pb-16 sm:px-9 sm:pt-20">
+            <div className="mx-auto">
               {/* Same idea as the case-study page: the image runs the full
                   width of this column, while the text sits in a narrower
                   inset — extra px-3 on mobile only, where the column's own
@@ -145,9 +145,54 @@ export default function ProjectModal({
                 />
               </div>
 
-              <p className="mt-12 px-3 font-serif text-xl leading-7 text-zinc-600 sm:px-0 dark:text-zinc-300">
-                {renderedProject.description}
-              </p>
+              {renderedProject.description.split("\n\n").map((paragraph, i) => (
+                <p
+                  key={i}
+                  className={`px-3 font-serif text-xl leading-7 text-zinc-600 sm:px-0 dark:text-zinc-300 ${
+                    i === 0 ? "mt-12" : "mt-4"
+                  }`}
+                >
+                  {paragraph}
+                </p>
+              ))}
+
+              {renderedProject.gallery && (
+                <div className="mt-8 flex flex-col gap-4">
+                  {/* First image runs the full column width; the rest sit in
+                      a row below it, side by side. All three share the same
+                      fixed height (rather than each keeping its own
+                      intrinsic aspect ratio) so the row reads as one
+                      consistent strip instead of a tall stack of
+                      mismatched-height photos. */}
+                  <div className="h-56 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                    <Image
+                      src={renderedProject.gallery[0].src}
+                      alt={renderedProject.title}
+                      width={renderedProject.gallery[0].width}
+                      height={renderedProject.gallery[0].height}
+                      unoptimized
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    {renderedProject.gallery.slice(1).map((item) => (
+                      <div
+                        key={item.src}
+                        className="h-56 overflow-hidden bg-zinc-100 dark:bg-zinc-800"
+                      >
+                        <Image
+                          src={item.src}
+                          alt={renderedProject.title}
+                          width={item.width}
+                          height={item.height}
+                          unoptimized
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
