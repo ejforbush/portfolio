@@ -15,14 +15,14 @@ export type Project = {
 export const projects: Project[] = [
   {
     slug: "settings-redesign",
-    title: "Restructuring settings for clarity and scale",
+    title: "Simplifying settings for scale",
     tagline: "Rethinking a cluttered settings experience end to end",
     description:
-      "Placeholder description: an overview of the settings redesign case study. Real write-up coming soon.",
+      "Veras is a B2B workforce management platform for senior living communities. As it expanded into Time & Attendance and Payroll, its Settings experience needed to scale alongside the growing product suite — instead of being reworked every time a new product was introduced.\n\nI restructured Settings around the way communities actually configured their operations, reduced unnecessary decisions during setup, and standardized patterns across the experience. Customer Success embraced the redesign, and future products adopted its information architecture rather than building their own.",
     image:
       "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=600&fit=crop&q=80&auto=format",
     tag: "Veras",
-    metric: "Reduced onboarding time by 30+ minutes.",
+    metric: "Preparing Veras for future products",
   },
   {
     slug: "credential-management",

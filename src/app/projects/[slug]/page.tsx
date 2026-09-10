@@ -80,7 +80,7 @@ export default async function ProjectPage({
           </div>
         </div>
 
-        <CaseStudyBody project={project} caseStudy={caseStudy} />
+        <CaseStudyBody caseStudy={caseStudy} />
 
         <AdditionalWork
           projects={collection.filter((p) => p.slug !== project.slug)}

@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { Project } from "@/data/projects";
 import type { CaseStudy, CaseStudyBlock } from "@/data/caseStudies";
-import ProjectModal from "@/components/ProjectModal";
 
 function Block({ block }: { block: CaseStudyBlock }) {
   switch (block.type) {
@@ -71,71 +69,70 @@ function useScrollSpy(ids: string[]) {
   return activeId;
 }
 
-export default function CaseStudyBody({
-  project,
-  caseStudy,
-}: {
-  project: Project;
-  caseStudy: CaseStudy;
-}) {
-  const [highlightsOpen, setHighlightsOpen] = useState(false);
+export default function CaseStudyBody({ caseStudy }: { caseStudy: CaseStudy }) {
   const sectionIds = caseStudy.sections.map((section) => section.id);
   const activeId = useScrollSpy(sectionIds);
 
   return (
-    <div className="mx-auto max-w-6xl px-6 pt-12 pb-24">
+    <div className="mx-auto max-w-7xl px-6 pt-12 pb-24">
       {/* Symmetric [1fr][33rem][1fr] gutter layout — a normal (non-absolute)
           grid, so the TOC stays fully in flow and its sticky child gets a
           proper containing block stretched to the article's height (grid's
           default align-items: stretch), letting it track scroll the whole
           way down like before. Because both gutters are the same 1fr, the
           middle (article) column is always exactly page-centered on its
-          own — independent of the TOC's presence — while the TOC lives as
-          a normal grid item in the left gutter, not glued to the article
-          as a combined block. At this container's max-w-6xl cap, gap-x-6
-          (24px) × 2 + article's 33rem (528px) leaves 528px for the two
-          gutters — 264px each, comfortably more than the TOC's natural
-          ~240px, so it degrades gracefully (not a hard cutoff) as the
-          viewport narrows below that. The TOC's own width is left fluid
-          (w-full, not a fixed px), so it shrinks along with its gutter
-          rather than overflowing it. */}
+          own — independent of the TOC's presence and of this container's
+          own width — while the TOC lives as a normal grid item in the left
+          gutter, not glued to the article as a combined block. That
+          independence is why bumping this cap from max-w-6xl to max-w-7xl
+          only pushes the TOC toward the true page edge (more gutter room
+          on wide screens) without shifting the article at all. At this
+          container's max-w-7xl cap, gap-x-6 (24px) × 2 + article's 33rem
+          (528px) leaves 656px for the two gutters — 328px each,
+          comfortably more than the TOC's natural ~240px, so it degrades
+          gracefully (not a hard cutoff) as the viewport narrows below
+          that. The TOC's own width is left fluid (w-full, not a fixed px)
+          minus the aside's pr-6, so it shrinks along with its gutter
+          rather than overflowing it, while always keeping that fixed
+          buffer before the gap. */}
       <div className="grid grid-cols-1 gap-y-10 lg:grid-cols-[1fr_minmax(0,33rem)_1fr] lg:gap-x-6">
         {/* TOC: sticky so it tracks scroll position alongside the article;
-            top offset clears the fixed nav pill. The quick-overview link
-            lives in the same sticky block so it scrolls — and sticks —
-            together with the section list, rather than scrolling away on
-            its own underneath it. pt-1.5 on the nav nudges its first
-            label down to visually align with the article's (larger,
-            taller-line-height) first heading, since the two use different
-            type sizes but should still read as starting on the same
-            line. */}
-        <aside className="hidden lg:block">
+            top offset clears the fixed nav pill. pt-1.5 on the nav nudges
+            its first label down to visually align with the article's
+            (larger, taller-line-height) first heading, since the two use
+            different type sizes but should still read as starting on the
+            same line. pr-6 reserves a fixed buffer (matching the page's own
+            px-6 edge padding) between the TOC text and the grid's gap-x-6,
+            so long labels that wrap out to the gutter's full fluid width
+            still land with even spacing before the article — without it,
+            the only separation left at narrower viewports is the 24px grid
+            gap itself, which reads as cramped once a label reaches it. */}
+        <aside className="hidden pr-6 lg:block">
           <div className="sticky top-24 w-full">
             <nav className="space-y-2 pt-1.5">
               {caseStudy.sections.map((section) => (
-                <a
-                  key={section.id}
-                  href={`#${section.id}`}
-                  className={`block text-sm leading-5 transition-colors duration-150 ${
-                    activeId === section.id
-                      ? "font-medium text-zinc-900 dark:text-zinc-100"
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-                  }`}
-                >
-                  {section.navLabel}
+                <a key={section.id} href={`#${section.id}`} className="relative block text-sm leading-5">
+                  {/* Invisible bold copy reserves the line count the active
+                      (font-medium) state needs, so switching a label's
+                      weight in and out never changes this link's height —
+                      without it, a label that wraps to an extra line only
+                      when bold would jump the rest of the TOC as it's
+                      scrolled past. */}
+                  <span aria-hidden className="invisible block font-medium">
+                    {section.navLabel}
+                  </span>
+                  <span
+                    className={`absolute inset-0 transition-colors duration-150 ${
+                      activeId === section.id
+                        ? "font-medium text-zinc-900 dark:text-zinc-100"
+                        : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                    }`}
+                  >
+                    {section.navLabel}
+                  </span>
                 </a>
               ))}
             </nav>
-            <div className="mt-10 space-y-1.5">
-              <p className="text-sm text-zinc-900 dark:text-zinc-100">Prefer a quick overview?</p>
-              <button
-                type="button"
-                onClick={() => setHighlightsOpen(true)}
-                className="cursor-pointer text-sm text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-              >
-                View highlights →
-              </button>
-            </div>
           </div>
         </aside>
 
@@ -154,11 +151,6 @@ export default function CaseStudyBody({
           ))}
         </article>
       </div>
-
-      <ProjectModal
-        project={highlightsOpen ? project : null}
-        onClose={() => setHighlightsOpen(false)}
-      />
     </div>
   );
 }

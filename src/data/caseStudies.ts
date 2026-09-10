@@ -24,141 +24,180 @@ export const caseStudies: Record<string, CaseStudy> = {
   "settings-redesign": {
     sections: [
       {
-        id: "background",
-        navLabel: "Background",
-        heading: "Background",
+        id: "company-background",
+        navLabel: "Company background",
+        heading: "Company background",
         blocks: [
           {
             type: "paragraph",
-            text: "Settings had become difficult to navigate as Veras grew. What started as a simple collection of administrative tools had evolved into a complex system that no longer matched how administrators worked.",
-          },
-          {
-            type: "paragraph",
-            text: "New customers often needed a 30-minute onboarding call just to configure settings, while Customer Success teams spent time helping users complete tasks they should have been able to handle independently.",
-          },
-          {
-            type: "paragraph",
-            text: "My goal was to redesign settings into a scalable experience that was easier to understand, safer to manage, and ready for future product growth.",
+            text: "Veras is a B2B workforce management platform for senior living communities. The platform included Scheduling, Messaging, Credentials, and Analytics. During this project, Veras was expanding into Time & Attendance and Payroll, which meant Settings needed to scale alongside the growing product suite.",
           },
         ],
       },
       {
-        id: "problem",
-        navLabel: "The problem",
-        heading: "The problem",
+        id: "settings-architecture-not-keeping-up",
+        navLabel: "As Veras added products, our settings architecture wasn't keeping up.",
+        heading: "As Veras added products, our settings architecture wasn't keeping up.",
         blocks: [
           {
             type: "paragraph",
-            text: "As the product expanded, settings became organized around how features were built rather than how customers managed their operations.",
+            text: "Veras was built organically, with new settings and features added as the product evolved. There was very little consistency in how Settings were organized. Related settings weren't grouped together, and configuring a community often meant jumping between settings in an order that didn't make much sense. Up until that point, investing in Settings hadn't been a priority, but as we were looking to ship several new products in the coming months, it was obvious our Settings experience needed an overhaul before it could support the level of complexity we were about to add.",
           },
           {
-            type: "list",
-            items: [
-              "Important settings were buried under “Advanced”",
-              "Related workflows were separated across different areas",
-              "Inconsistent patterns made the product harder to learn",
-              "Users lacked confidence when making important changes",
-            ],
-            // Rendered as a real <ul> in CaseStudyBody, so items are stored
-            // without a leading bullet character.
+            type: "paragraph",
+            text: "Settings were complex enough that our customer success team decided that every new customer would get a 30-minute setup call where an onboarding specialist would walk through each setting to make sure everything was configured correctly before the customer ever started using the product. We had previously tried a more self-guided experience, and it had been disastrous.",
+          },
+          {
+            type: "paragraph",
+            text: "When setting up the platform on their own, customers frequently made configuration mistakes that made the product much more difficult to use. One of the most common was creating dozens of shift templates instead of a small set of reusable templates. Instead of scheduling eight CNAs from a single template, communities ended up managing dozens of nearly identical templates. Filtering schedules became cluttered, moving employees between shifts became more tedious, and staffing budgets became unnecessarily granular. Customers would reach out in frustration, then a member of our customer success team would step in, delete the unnecessary templates, and help them rebuild the configuration the right way.",
+          },
+          {
+            type: "paragraph",
+            text: "In redesigning Settings to be scalable for upcoming products, I wanted to make sure that same redesign would also improve customers' initial experience with the product and make it easier for them to configure their community correctly.",
           },
         ],
       },
       {
         id: "understanding-the-problem",
-        navLabel: "Understanding the problem",
-        heading: "Understanding the problem",
+        navLabel: "Configuring settings required a translator",
+        heading: "Configuring settings required a translator",
         blocks: [
           {
             type: "paragraph",
-            text: "I partnered with Customer Success, reviewed onboarding sessions and support tickets, audited existing workflows, and analyzed product usage through PostHog and Metabase.",
-          },
-          { type: "paragraph", text: "Three themes emerged:" },
-          {
-            type: "insight",
-            number: "01",
-            title: "Settings reflected product evolution, not user workflows",
-            body: "Administrators thought about managing their teams and operations, not individual product features.",
+            text: "I spent time sitting in onboarding calls, watching customers configure the platform alongside their onboarding specialist. I quickly realized a lot of the call wasn't actually spent configuring things, it was spent explaining what each setting did.",
           },
           {
-            type: "insight",
-            number: "02",
-            title: "Inconsistent patterns created unnecessary friction",
-            body: "Different settings behaved differently, making the experience harder to learn and trust.",
+            type: "paragraph",
+            text: "The specialist would ask for a community's bed count, and customers would often spend several minutes trying to answer a question that didn't actually affect the product. Bed count had existed for previous features, but in its current state it only created confusion and wasted time.",
           },
           {
-            type: "insight",
-            number: "03",
-            title: "Important actions lacked clarity and safeguards",
-            body: "Users needed more confidence when making changes that affected their organization.",
+            type: "paragraph",
+            text: "The specialist would ask how their areas were organized, only to realize the customer didn't know what an \"Area\" was in Veras.",
+          },
+          {
+            type: "paragraph",
+            text: "The specialist would turn on features like Open Shift Pickup without even asking because nearly every community wanted it, while skipping over settings like Auto Publish because explaining what the setting did usually confused customers at that stage. Much of the onboarding call was spent helping customers make decisions they didn't have enough context to make on their own.",
+          },
+          {
+            type: "paragraph",
+            text: "I watched dozens of PostHog recordings to see how people navigated Settings without a specialist there to help. One recording that stuck out was a user trying to edit a shift template. They opened a help article, went back to the product, read a little more, clicked around, and eventually gave up without contacting support. Their permissions settings were configured in such a way that the page they needed to edit was completely hidden from them, but nothing in the interface made that obvious.",
+          },
+          {
+            type: "paragraph",
+            text: "The same patterns showed up outside of onboarding. Existing customers still struggled to find and configure settings on their own.",
+          },
+          {
+            type: "paragraph",
+            text: "Before I began the redesign, I created an inventory of every setting in the platform, documenting where it lived, what it controlled, and whether it was still relevant. Looking at everything together, it was clear that years of product growth had shaped the Settings experience, leaving it disconnected from the way customers actually thought when configuring their communities.",
+          },
+          {
+            type: "paragraph",
+            text: "Three themes came up consistently throughout my research. They became the guiding principles for the redesign:",
+          },
+          {
+            type: "list",
+            items: [
+              "Organize around the customer's workflow",
+              "Reduce unnecessary decisions",
+              "Use consistent design patterns",
+            ],
           },
         ],
       },
       {
-        id: "organize-settings-for-clarity",
-        navLabel: "Organize settings for clarity",
-        heading: "Organizing settings around workflows",
+        id: "organize-around-workflow",
+        navLabel: "Organize around the customer's workflow",
+        heading: "Organize around the customer's workflow",
         blocks: [
           {
             type: "paragraph",
-            text: "I restructured the information architecture around how administrators actually worked, breaking apart the existing “Advanced” section and creating clearer categories that could scale with future products.",
+            text: "The new information architecture followed the same order communities already used when configuring their operations.",
+          },
+          {
+            type: "list",
+            items: [
+              "Community came first because it applied to the entire platform, regardless of which products a customer used.",
+              "User Access followed so everyone participating in onboarding could access the platform and follow along as it was configured.",
+              "Positions established the foundation by defining the roles and shifts each community would use.",
+              "Areas built on positions and defined where each role worked.",
+              "Budgets used positions, shifts, and areas to define the staffing requirements for each community.",
+              "Compliance allowed for additional staffing rules for communities with more complex requirements.",
+              "Staff Experience focused on the features employees would use every day, once the core scheduling setup was complete.",
+              "Automation intentionally came last. It wasn't required for setup, but once customers understood how the platform worked, they could make informed decisions about what they wanted to automate.",
+            ],
+          },
+          {
+            type: "paragraph",
+            text: "Grouping related settings made the platform easier to navigate long after onboarding concluded. Customers could find settings by following the way they already thought about their community, rather than remembering where a feature happened to live.",
+          },
+          {
+            type: "paragraph",
+            text: "The new structure also gave Settings a scalable framework for future products. Instead of throwing new products onto existing Settings pages, each product could be introduced as its own section with its own subpages.",
           },
         ],
       },
       {
-        id: "standardize-patterns-and-behaviors",
-        navLabel: "Standardize patterns and behaviors",
-        heading: "Creating consistent patterns",
+        id: "reduce-unnecessary-decisions",
+        navLabel: "Reduce unnecessary decisions",
+        heading: "Reduce unnecessary decisions",
         blocks: [
           {
             type: "paragraph",
-            text: "I introduced shared interaction patterns across settings, including consistent layouts, save behaviors, defaults, and reusable components.",
+            text: "I focused on eliminating decisions that added little value during setup. Communities still had access to the same level of customization, but the most common path became much simpler.",
+          },
+          {
+            type: "list",
+            items: [
+              "Infrequently used settings were moved out of the primary setup flow or removed altogether, helping customers focus on the decisions that actually mattered during setup.",
+              "Defaults were driven by data rather than assumptions. I analyzed PostHog and Metabase data to identify which settings communities actually chose most often, then used those as the defaults for new communities.",
+              "Progressive disclosure kept advanced configuration out of the way until it was needed. Most communities only needed a handful of fields to create a position, so additional options appeared only when customers chose to customize them.",
+            ],
+          },
+          {
+            type: "paragraph",
+            text: "The redesign preserved the platform's flexibility while reducing unnecessary decisions during setup.",
           },
         ],
       },
       {
-        id: "make-changes-clear-and-safe",
-        navLabel: "Make changes clear and safe",
-        heading: "Making changes clear and safe",
+        id: "use-consistent-design-patterns",
+        navLabel: "Use consistent design patterns",
+        heading: "Use consistent design patterns",
         blocks: [
           {
             type: "paragraph",
-            text: "I improved communication around important actions through clearer warnings, feedback states, and confirmation patterns.",
+            text: "Similar functionality often behaved differently throughout Settings. Save behavior, confirmations, layouts, and components had all evolved independently over time. My goal was to standardize those patterns so customers didn't have to second guess how the interface would work.",
           },
-        ],
-      },
-      {
-        id: "testing-and-iteration",
-        navLabel: "Testing & iteration",
-        heading: "Testing & iteration",
-        blocks: [
           {
-            type: "paragraph",
-            text: "I built a functional prototype using our codebase to validate the experience with Customer Success and provide engineering with a realistic reference during implementation.",
+            type: "list",
+            items: [
+              "Save behavior became consistent across Settings. Customers no longer had to wonder whether changes would save automatically, require saving the entire page, or update one item at a time. Once they learned how changes were applied, that behavior stayed consistent throughout the experience.",
+              "Destructive actions followed the same confirmation pattern throughout Settings. Whether customers were deleting a position, area, or another configuration, the experience consistently communicated when an action was permanent and required confirmation.",
+              "Related functionality reused the same layouts, components, and interaction patterns instead of treating every feature as a unique experience. The Staff Experience page brought together multiple scheduling features under a shared structure, making it easier to scan, compare, and configure similar settings.",
+            ],
           },
           {
             type: "paragraph",
-            text: "Feedback helped refine edge cases, including overflow states, staffing workflows, and areas where existing automation required additional technical investment.",
+            text: "By building on familiar patterns instead of reinventing them, customers could spend less time learning how Settings worked and more time configuring their community.",
           },
         ],
       },
       {
         id: "outcome",
-        navLabel: "Outcome",
-        heading: "Outcome",
+        navLabel: "A foundation for future products",
+        heading: "A foundation for future products",
         blocks: [
           {
             type: "paragraph",
-            text: "The redesigned settings experience created a scalable foundation for future growth.",
+            text: "The redesign gave Veras a Settings experience that could scale alongside the platform instead of being reworked every time a new product was introduced. As Veras expanded into Time & Attendance and Payroll, those products adopted the redesigned information architecture rather than creating their own Settings structure. Each product had a dedicated place within the platform, allowing Settings to grow intentionally instead of becoming increasingly fragmented.",
           },
           {
-            type: "list",
-            items: [
-              "Reduced onboarding time by 30+ minutes",
-              "Helped Customer Success teams train users more efficiently",
-              "Created consistent patterns that made settings easier to learn and trust",
-              "Enabled administrators to manage more workflows independently",
-            ],
+            type: "paragraph",
+            text: "Customer Success embraced the redesign because it directly addressed the challenges they encountered during onboarding. By introducing decisions in a more natural order, removing unnecessary configuration, and standardizing patterns across Settings, the redesign made it easier for Customer Success to onboard new communities and easier for customers to configure the platform with confidence.",
+          },
+          {
+            type: "paragraph",
+            text: "The project also established a framework for future design decisions. Rather than finding space for new features on existing pages, future Settings work was expected to fit within the established workflow, reduce unnecessary decisions, and build on existing design patterns. The redesign became a foundation the product team could continue building on as Veras expanded.",
           },
         ],
       },
